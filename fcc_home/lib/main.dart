@@ -1,5 +1,8 @@
+import 'package:fcc_home/mine_page_widget.dart';
+import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/material.dart';
 
+import 'auth_page.dart';
 import 'home_page_widget.dart';
 
 void main() {
@@ -24,10 +27,16 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.amber,
       ),
+      routes: {
+        "/": (context) => const HomePageWidget(title: 'Home Page'),
+        "mine_page": (context) => MinePageWidget(),
+        "server_page": (context) => ServerPageWidget(),
+        "auth": (context) => AuthPage()
+      },
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      home: const HomePageWidget(title: 'Flutter Demo Home Page'),
+      initialRoute: "/",
     );
   }
 }
