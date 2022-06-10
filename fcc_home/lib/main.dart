@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         "auth": (context) => AuthPage()
       },
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      initialRoute: "/",
+      initialRoute: "auth",
     );
   }
 }
