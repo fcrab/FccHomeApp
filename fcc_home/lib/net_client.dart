@@ -25,22 +25,37 @@ class NetClient {
 
   String baseUrl = "http://127.0.0.1:8000/";
 
-  Future<String> postLogin(String user, String psw) async {
+  Future<String?> postLogin(String user, String psw) async {
     String authUrl = "token/";
     try {
       var response = await dio
           .post(baseUrl + authUrl, data: {'username': user, 'password': psw});
       print(response);
+      return parseResult(response);
     } catch (exp) {
       print(exp);
     }
 
-    return "";
+    return null;
   }
 
-  Future<String> refreshToken() async {
+  Future<String?> refreshToken(String refreshToken) async {
     String tokenUrl = "/token/refresh";
+    try {
+      var response = await dio.post(baseUrl + tokenUrl,
+          options: Options(headers: {'Authorization': refreshToken}));
 
-    return "";
+      return parseResult(response);
+    } catch (exp) {
+      print(exp);
+    }
+    return null;
+  }
+
+  String? parseResult(Response response) {
+    if (response.statusCode == 200) {
+      return response.data.toString();
+    }
+    return null;
   }
 }

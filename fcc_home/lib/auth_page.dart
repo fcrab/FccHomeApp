@@ -2,6 +2,9 @@ import 'package:fcc_home/net_client.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
+import 'home_global.dart';
+import 'dart:convert';
+
 /**
  * user auth
  */
@@ -25,12 +28,20 @@ class AuthPageState extends State<AuthPage> {
   Future<void> sendLogin() async {
     try {
       _progressDialog.show(message: "请稍后");
-      client.postLogin(authNameCtrl.text, authPswCtrl.text);
+      var tokenMap =
+          await client.postLogin(authNameCtrl.text, authPswCtrl.text);
+      if (tokenMap != null) {
+        Map<String, dynamic> jsonObj = json.decode(tokenMap);
+        HomeGlobal.saveAccessToken(jsonObj['access']);
+        HomeGlobal.saveRefreshToken(jsonObj['refresh']);
+      }
     } catch (exp) {
       print(exp);
     } finally {
       _progressDialog.hide();
     }
+    //todo if get token then jump into homepage
+    setState(() {});
   }
 
   @override

@@ -3,9 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeGlobal {
   static String token = "";
 
-  static saveLocalToken(String value) async {
+  static saveAccessToken(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("token", value);
+  }
+
+  static saveRefreshToken(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("refresh", value);
   }
 
   static _getLocalToken() async {
