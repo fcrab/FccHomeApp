@@ -1,4 +1,7 @@
+import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/material.dart';
+
+import 'mine_page_widget.dart';
 
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({Key? key, required this.title}) : super(key: key);
@@ -16,8 +19,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pageWidget = <Widget>[
-    Text('index 1 :mine'),
-    Text('index 2: server')
+    MinePageWidget(),
+    ServerPageWidget()
   ];
 
   void _onTapItem(int index) {
@@ -49,7 +52,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '我'),
-          BottomNavigationBarItem(icon: Icon(Icons.album), label: '云')
+          BottomNavigationBarItem(icon: Icon(Icons.cloud), label: '云')
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
