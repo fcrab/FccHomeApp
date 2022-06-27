@@ -2,11 +2,13 @@ package com.crabfibber.fcc_home
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentUris
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import com.google.gson.Gson
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -34,7 +36,7 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 "getAllPics" -> {
-
+                    getPics()
                 }
             }
 
@@ -90,7 +92,48 @@ class MainActivity : FlutterActivity() {
 
     val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
-    fun getPics() {
+    val localPicsList = mutableListOf<String>()
 
+    fun getPics() {
+        val gson = Gson()
+        val query = applicationContext.contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            STORE_IMAGES,
+            null,
+            null,
+            sortOrder
+        )
+
+        query?.use {
+            val idColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val nameColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            val dateColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+            val sizeColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+            val bucketColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
+            val bucketNameColumn =
+                it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+
+            while (it.moveToNext()) {
+                val valueMap = mutableMapOf<String, String>()
+                val id = it.getLong(idColumn)
+                val name = it.getString(nameColumn)
+                val date = it.getString(dateColumn)
+                val size = it.getString(sizeColumn)
+                val bucketId = it.getLong(bucketColumn)
+                val bucketName = it.getString(bucketNameColumn)
+                val uri =
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                valueMap["id"] = id.toString()
+                valueMap["name"] = name
+                valueMap["date"] = date
+                valueMap["size"] = size
+                valueMap["bucketId"] = bucketId.toString()
+                valueMap["bucketName"] = bucketName
+                valueMap["uri"] = uri.path ?: ""
+                val infos = gson.toJson(valueMap)
+                Log.d("MainAct", infos)
+                localPicsList += infos
+            }
+        }
     }
 }

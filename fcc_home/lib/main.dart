@@ -1,5 +1,6 @@
 import 'package:fcc_home/mine_page_widget.dart';
 import 'package:fcc_home/server_page_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'auth_page.dart';
@@ -30,7 +31,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.amber,
       ),
       routes: {
-        "/": (context) => const HomePageWidget(title: 'Home Page'),
+        "/": (context) =>
+            HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
         "mine_page": (context) => MinePageWidget(),
         "server_page": (context) => ServerPageWidget(),
         "auth": (context) => AuthPage()

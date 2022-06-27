@@ -1,17 +1,40 @@
 import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'mine_page_widget.dart';
 
 class HomePageWidget extends StatefulWidget {
-  const HomePageWidget({Key? key, required this.title}) : super(key: key);
+  HomePageWidget({Key? key, required this.title, required this.platform})
+      : super(key: key);
+  final TargetPlatform platform;
   final String title;
 
   @override
-  State<HomePageWidget> createState() => _HomePageWidgetState();
+  State<HomePageWidget> createState() => _HomePageWidgetState(platform);
 }
 
-class _HomePageWidgetState extends State<HomePageWidget> {
+class _HomePageWidgetState extends State<HomePageWidget>
+    with WidgetsBindingObserver {
+  _HomePageWidgetState(this.defaultTargetPlatform) : super();
+  static const platform = MethodChannel("com.crabfibber.fcc_home/event");
+  final TargetPlatform defaultTargetPlatform;
+
+  @override
+  void initState() {
+    print("demo page init state");
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        dynamic result = await platform.invokeMethod("");
+        // _initApp();
+        // _listenToEvent();
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+        //todo init sdk
+      }
+    });
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
   void _incrementCounter() {
     setState(() {});
   }
