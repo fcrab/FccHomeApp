@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +27,20 @@ class _HomePageWidgetState extends State<HomePageWidget>
     print("demo page init state");
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        dynamic result = await platform.invokeMethod("");
+        dynamic result = await platform.invokeMethod("requestPermission");
+        print(result);
+        if (result == true) {
+          print("next step");
+          dynamic pics = await platform.invokeListMethod("getAllPics");
+          // print(pics);
+          List<String> picsPath = [];
+          for (String pic in pics) {
+            Map<String, dynamic> picsMap = json.decode(pic);
+            print(picsMap['data']);
+            picsPath.add(picsMap['data']);
+          }
+          (_pageWidget[0] as MinePageWidget).setList(picsPath);
+        }
         // _initApp();
         // _listenToEvent();
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -41,7 +56,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   int _selectedIndex = 0;
 
-  static const List<Widget> _pageWidget = <Widget>[
+  static final List<Widget> _pageWidget = <Widget>[
     MinePageWidget(),
     ServerPageWidget()
   ];

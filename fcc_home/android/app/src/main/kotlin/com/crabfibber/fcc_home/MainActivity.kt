@@ -36,7 +36,9 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 "getAllPics" -> {
-                    getPics()
+                    getPics { list ->
+                        result.success(list)
+                    }
                 }
             }
 
@@ -87,14 +89,15 @@ class MainActivity : FlutterActivity() {
         MediaStore.Images.Media.SIZE,
         MediaStore.Images.Media._ID,  // id
         MediaStore.Images.Media.BUCKET_ID,  // dir id 目录
-        MediaStore.Images.Media.BUCKET_DISPLAY_NAME // dir name 目录名字
+        MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
+        MediaStore.Images.Media.DATA
     )
 
     val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
     val localPicsList = mutableListOf<String>()
 
-    fun getPics() {
+    fun getPics(callback: (list: List<String>) -> Unit) {
         val gson = Gson()
         val query = applicationContext.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -112,6 +115,7 @@ class MainActivity : FlutterActivity() {
             val bucketColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
             val bucketNameColumn =
                 it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+            val dataColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
 
             while (it.moveToNext()) {
                 val valueMap = mutableMapOf<String, String>()
@@ -130,10 +134,12 @@ class MainActivity : FlutterActivity() {
                 valueMap["bucketId"] = bucketId.toString()
                 valueMap["bucketName"] = bucketName
                 valueMap["uri"] = uri.path ?: ""
+                valueMap["data"] = it.getString(dataColumn)
                 val infos = gson.toJson(valueMap)
                 Log.d("MainAct", infos)
                 localPicsList += infos
             }
+            callback(localPicsList)
         }
     }
 }

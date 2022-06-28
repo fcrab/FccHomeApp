@@ -24,7 +24,11 @@ class ServerPageState extends State<ServerPageWidget> {
         itemCount: entries.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
-            child: Center(child: Image.network(entries[index])),
+            padding: const EdgeInsets.only(top: 4),
+            child: Image.network(entries[index],
+                height: 200,
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.low),
           );
         });
   }
