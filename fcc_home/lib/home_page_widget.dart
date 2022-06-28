@@ -79,7 +79,11 @@ class _HomePageWidgetState extends State<HomePageWidget>
         child: Text("test"),
       ),
       body: Center(
-        child: _pageWidget.elementAt(_selectedIndex),
+        // child: _pageWidget.elementAt(_selectedIndex),
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: _pageWidget,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,

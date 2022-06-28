@@ -67,6 +67,22 @@ class MinePageState extends State<MinePageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      children: List.generate(entries.length, (index) {
+        return Container(
+            // child: Center(child: Image.network(entries[index])),
+            padding: const EdgeInsets.all(4),
+            // child: Center(
+            child: Image.file(File(entries[index]),
+                fit: BoxFit.cover,
+                height: 150,
+                filterQuality: FilterQuality.low)
+            // ),
+            );
+      }),
+    );
+
     return GridView.builder(
         padding: const EdgeInsets.all(4),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -84,8 +100,8 @@ class MinePageState extends State<MinePageWidget> {
                   fit: BoxFit.cover,
                   height: 150,
                   filterQuality: FilterQuality.low)
-              // ),
-              );
+            // ),
+          );
         });
   }
 }
