@@ -46,10 +46,34 @@ class MinePageState extends State<MinePageWidget> {
     return images;
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return ListView.builder(
+  //       padding: const EdgeInsets.all(4),
+  //       itemCount: entries.length,
+  //       itemBuilder: (BuildContext context, int index) {
+  //         return Container(
+  //             // child: Center(child: Image.network(entries[index])),
+  //             padding: const EdgeInsets.only(top: 4),
+  //             // child: Center(
+  //             child: Image.file(File(entries[index]),
+  //                 fit: BoxFit.cover,
+  //                 height: 150,
+  //                 filterQuality: FilterQuality.low)
+  //             // ),
+  //             );
+  //       });
+  // }
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return GridView.builder(
         padding: const EdgeInsets.all(4),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 4 / 3,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 2),
         itemCount: entries.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
