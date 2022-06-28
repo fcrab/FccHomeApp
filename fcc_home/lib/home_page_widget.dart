@@ -43,9 +43,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
         }
         // _initApp();
         // _listenToEvent();
-      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        //todo init sdk
-      }
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {}
     });
     WidgetsBinding.instance!.addObserver(this);
   }
