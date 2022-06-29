@@ -73,12 +73,18 @@ class MinePageState extends State<MinePageWidget> {
         return Container(
             // child: Center(child: Image.network(entries[index])),
             padding: const EdgeInsets.all(4),
-            // child: Center(
-            child: Image.file(File(entries[index]),
-                fit: BoxFit.cover,
-                height: 150,
-                filterQuality: FilterQuality.low)
-            // ),
+            child: Image(
+              image: FileImage(File(entries[index]), scale: 0.1),
+              height: 150,
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.low,
+            )
+
+            // child: Image.file(File(entries[index]),
+            //     fit: BoxFit.cover,
+            //     height: 150,
+            //     filterQuality: FilterQuality.low)
+
             );
       }),
     );
