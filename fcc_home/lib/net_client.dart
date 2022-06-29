@@ -52,6 +52,28 @@ class NetClient {
     return null;
   }
 
+  Future<String?> getServerPicsList(String token, String dir) async {
+    String picListUrl = "/filelist";
+    try {
+      var response = await dio.post(baseUrl + picListUrl + "/" + dir);
+      return parseResult(response);
+    } catch (exp) {
+      print(exp);
+    }
+    return null;
+  }
+
+  Future<String?> getServerDirList(String token) async {
+    String dirListUrl = "/dirlist";
+    try {
+      var response = await dio.post(baseUrl + dirListUrl + "/");
+      return parseResult(response);
+    } catch (exp) {
+      print(exp);
+    }
+    return null;
+  }
+
   String? parseResult(Response response) {
     if (response.statusCode == 200) {
       return response.data.toString();
