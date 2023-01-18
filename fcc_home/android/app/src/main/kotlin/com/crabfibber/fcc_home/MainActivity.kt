@@ -122,7 +122,7 @@ class MainActivity : FlutterActivity() {
                 val id = it.getLong(idColumn)
                 val name = it.getString(nameColumn)
                 val date = it.getString(dateColumn)
-                val size = it.getString(sizeColumn)
+                val size = it.getString(sizeColumn) ?: ""
                 val bucketId = it.getLong(bucketColumn)
                 val bucketName = it.getString(bucketNameColumn)
                 val uri =
