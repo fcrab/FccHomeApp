@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/adapter.dart';
@@ -23,13 +24,37 @@ class NetClient {
     };
   }
 
-  String baseUrl = "http://127.0.0.1:8000/";
+  String baseUrl = "http://172.16.0.2:8000/";
+
+  Future<String?> register(String name, String psw) async {
+    String authUrl = "auth/create";
+    try {
+      var map = {
+        'name': name,
+        'password': psw,
+        'salt': '',
+        'email': '',
+        'phoneNumber': '',
+        'status': 1,
+        'createTime': '',
+        'lastLoginTime': ''
+      };
+
+      var response = await dio.post(baseUrl + authUrl, data: map);
+      print(response);
+      return parseResult(response);
+    } catch (exp) {
+      print(exp);
+    }
+
+    return null;
+  }
 
   Future<String?> postLogin(String user, String psw) async {
-    String authUrl = "token/";
+    String authUrl = "auth/login";
     try {
-      var response = await dio
-          .post(baseUrl + authUrl, data: {'username': user, 'password': psw});
+      var map = {'name': user, 'password': psw};
+      var response = await dio.post(baseUrl + authUrl, data: map);
       print(response);
       return parseResult(response);
     } catch (exp) {
@@ -40,7 +65,7 @@ class NetClient {
   }
 
   Future<String?> refreshToken(String refreshToken) async {
-    String tokenUrl = "/token/refresh";
+    String tokenUrl = "token/refresh";
     try {
       var response = await dio.post(baseUrl + tokenUrl,
           options: Options(headers: {'Authorization': refreshToken}));
@@ -52,10 +77,12 @@ class NetClient {
     return null;
   }
 
-  Future<String?> getServerPicsList(String token, String dir) async {
-    String picListUrl = "/filelist";
+  Future<String?> getServerPicsList(String token, String dir, int? page) async {
+    String picListUrl = "files/listByPage";
     try {
-      var response = await dio.post(baseUrl + picListUrl + "/" + dir);
+      var map = {'user': token, 'folder': dir, 'page': page ?? 0};
+      // var response = await dio.post(baseUrl + picListUrl + "/" + dir);
+      var response = await dio.get(baseUrl + picListUrl, queryParameters: map);
       return parseResult(response);
     } catch (exp) {
       print(exp);
@@ -64,9 +91,10 @@ class NetClient {
   }
 
   Future<String?> getServerDirList(String token) async {
-    String dirListUrl = "/dirlist";
+    String dirListUrl = "folder/list";
     try {
-      var response = await dio.post(baseUrl + dirListUrl + "/");
+      var map = {'id': token};
+      var response = await dio.get(baseUrl + dirListUrl, queryParameters: map);
       return parseResult(response);
     } catch (exp) {
       print(exp);
@@ -76,7 +104,8 @@ class NetClient {
 
   String? parseResult(Response response) {
     if (response.statusCode == 200) {
-      return response.data.toString();
+      return jsonEncode(response.data);
+      // return response.data.toString();
     }
     return null;
   }

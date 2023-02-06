@@ -36,7 +36,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
           List<String> picsPath = [];
           for (String pic in pics) {
             Map<String, dynamic> picsMap = json.decode(pic);
-            print(picsMap['data']);
+            // print(picsMap['data']);
             picsPath.add(picsMap['data']);
           }
           (_pageWidget[0] as MinePageWidget).setList(picsPath);

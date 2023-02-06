@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+
+import 'net_client.dart';
 
 /// 按日期排序，直接显示所有照片
 class ServerPageWidget extends StatefulWidget {
@@ -10,12 +15,52 @@ class ServerPageWidget extends StatefulWidget {
   }
 }
 
-class ServerPageState extends State<ServerPageWidget> {
+class ServerPageState extends State<ServerPageWidget>
+    with WidgetsBindingObserver {
+  late SimpleFontelicoProgressDialog _progressDialog;
+
+  var client = NetClient();
+
+  Future<void> getPics() async {
+    try {
+      print('begin get file from server');
+      _progressDialog.show(message: "请稍后");
+      var tokenMap = await client.getServerPicsList('', '', null);
+      if (tokenMap != null) {
+        List<dynamic> jsonObj = json.decode(tokenMap);
+        for (Map<String, dynamic> obj in jsonObj) {
+          if (!obj['filepath'].toString().endsWith(".mov")) {
+            entries.add(obj['filepath']);
+          }
+        }
+        // HomeGlobal.saveAccessToken(jsonObj['access']);
+        // HomeGlobal.saveRefreshToken(jsonObj['refresh']);
+      }
+    } catch (exp) {
+      print(exp);
+    } finally {
+      _progressDialog.hide();
+    }
+    //todo if get token then jump into homepage
+    setState(() {});
+  }
+
   List<String> entries = [
-    'https://img1.mydrivers.com/img/20210329/209025c28e7c443bb6e070c39b6574b9.png',
-    'https://www.zhifure.com/upload/images/2018/9/15212126838.jpg',
-    'https://www.inbar.int/wp-content/uploads/2020/12/3.jpg'
+    // 'https://img1.mydrivers.com/img/20210329/209025c28e7c443bb6e070c39b6574b9.png',
+    // 'https://www.zhifure.com/upload/images/2018/9/15212126838.jpg',
+    // 'https://www.inbar.int/wp-content/uploads/2020/12/3.jpg'
   ];
+
+  @override
+  void initState() {
+    print("server page init");
+    _progressDialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      getPics();
+    });
+    WidgetsBinding.instance.addObserver(this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +71,7 @@ class ServerPageState extends State<ServerPageWidget> {
           return Container(
             padding: const EdgeInsets.only(top: 4),
             child: Image.network(entries[index],
-                height: 200,
+                height: 300,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.low),
           );

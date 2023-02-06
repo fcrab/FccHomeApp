@@ -130,13 +130,13 @@ class MainActivity : FlutterActivity() {
                 valueMap["id"] = id.toString()
                 valueMap["name"] = name
                 valueMap["date"] = date
-                valueMap["size"] = size
+                valueMap["size"] = size ?: "0"
                 valueMap["bucketId"] = bucketId.toString()
                 valueMap["bucketName"] = bucketName
                 valueMap["uri"] = uri.path ?: ""
                 valueMap["data"] = it.getString(dataColumn)
                 val infos = gson.toJson(valueMap)
-                Log.d("MainAct", infos)
+//                Log.d("MainAct", infos)
                 localPicsList += infos
             }
             callback(localPicsList)

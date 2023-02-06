@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'auth_page.dart';
-import 'home_page_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,11 +30,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.amber,
       ),
       routes: {
-        "/": (context) =>
-            HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
+        // "/": (context) =>
+        //     HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
         "mine_page": (context) => MinePageWidget(),
         "server_page": (context) => ServerPageWidget(),
-        "auth": (context) => AuthPage()
+        // "auth": (context) => AuthPage()
+        "/": (context) => AuthPage()
       },
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       initialRoute: "/",
