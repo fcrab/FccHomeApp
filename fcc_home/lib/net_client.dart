@@ -24,7 +24,7 @@ class NetClient {
     };
   }
 
-  String baseUrl = "http://172.16.0.2:8000/";
+  String baseUrl = "http://172.16.73.222:8080/";
 
   Future<String?> register(String name, String psw) async {
     String authUrl = "auth/create";
@@ -104,9 +104,17 @@ class NetClient {
 
   String? parseResult(Response response) {
     if (response.statusCode == 200) {
-      return jsonEncode(response.data);
+      print(response.data);
+      var result = response.data['result'];
+      var content = jsonEncode(response.data['content']);
+      if (result == true) {
+        return content;
+      } else {
+        throw Exception(content);
+      }
       // return response.data.toString();
+    } else {
+      throw Exception(response.statusCode);
     }
-    return null;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fcc_home/entity/login_info.dart';
 import 'package:fcc_home/net_client.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
@@ -29,11 +30,18 @@ class AuthPageState extends State<AuthPage> {
   Future<void> sendLogin() async {
     try {
       _progressDialog.show(message: "请稍后");
-      var tokenMap =
+      var loginStr =
           await client.postLogin(authNameCtrl.text, authPswCtrl.text);
-      if (tokenMap != null) {
-        Map<String, dynamic> jsonObj = json.decode(tokenMap);
-        HomeGlobal.saveAccessToken(jsonObj['access']);
+      if (loginStr != null) {
+        Map<String, dynamic> jsonObj = json.decode(loginStr);
+        var loginInfo = LoginInfo.fromJson(jsonObj);
+        HomeGlobal.saveAccessToken(loginInfo.id);
+        // if(result == true){
+        //
+        //   HomeGlobal.saveAccessToken(jsonObj['access']);
+        // }else{
+        //   print("login error:" +loginStr);
+        // }
         // HomeGlobal.saveRefreshToken(jsonObj['refresh']);
       }
     } catch (exp) {
