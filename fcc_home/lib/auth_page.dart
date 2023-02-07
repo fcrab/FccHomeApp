@@ -56,6 +56,7 @@ class AuthPageState extends State<AuthPage> {
   Future<void> sendRegister() async {
     try {
       _progressDialog.show(message: "请稍后");
+      // var info = LoginInfo.info(name:authNameCtrl.text,password: authPswCtrl.text);
       var tokenMap = await client.register(authNameCtrl.text, authPswCtrl.text);
       if (tokenMap != null) {
         Map<String, dynamic> jsonObj = json.decode(tokenMap);
