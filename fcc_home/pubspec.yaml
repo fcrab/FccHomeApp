@@ -42,6 +42,7 @@ dependencies:
   event_bus: ^2.0.0
   simple_fontellico_progress_dialog: ^0.2.1
   image_picker: ^0.8.5+3
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:

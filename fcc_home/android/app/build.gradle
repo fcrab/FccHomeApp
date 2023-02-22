@@ -50,6 +50,19 @@ android {
         versionName flutterVersionName
     }
 
+//    signingConfigs {
+//        debug {
+//            storeFile file('/Users/fcc/work/push/amspush.jks')
+////            storeFile file('C:\\code\\work\\ipush\\ver_java\\ipushClient\\keystore\\amspush.jks')
+//////            storeFile file('C:\\code\\work\\push\\ipush-sdk-android\\amspush.jks')
+//            keyAlias 'amspush'
+//            keyPassword '123456'
+//            storePassword '123456'
+//            v1SigningEnabled true
+////            v2SigningEnabled true
+//        }
+//    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
