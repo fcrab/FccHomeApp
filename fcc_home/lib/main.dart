@@ -30,8 +30,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.amber,
       ),
       routes: {
-        // "/": (context) =>
-        //     HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
+        // "/": (context) => HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
         "mine_page": (context) => MinePageWidget(),
         "server_page": (context) => ServerPageWidget(),
         // "auth": (context) => AuthPage()

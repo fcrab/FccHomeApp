@@ -39,7 +39,7 @@ class LoginInfo {
 
   factory LoginInfo.fromJson(Map<String, dynamic> json) {
     return LoginInfo(
-        id: json['id'] as String,
+        id: (json['id'] as int).toString(),
         name: json['name'] as String,
         password: (json['password'] ?? "") as String,
         salt: json['salt'] as String,

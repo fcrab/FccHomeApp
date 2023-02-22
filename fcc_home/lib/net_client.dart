@@ -24,7 +24,8 @@ class NetClient {
     };
   }
 
-  String baseUrl = "http://172.16.73.222:8080/";
+  // String baseUrl = "http://172.16.73.222:8080/";
+  String baseUrl = "http://172.16.0.18:8080/";
 
   Future<String?> register(String name, String psw) async {
     String authUrl = "auth/create";
