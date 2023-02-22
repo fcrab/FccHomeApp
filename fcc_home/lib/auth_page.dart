@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:fcc_home/entity/login_info.dart';
 import 'package:fcc_home/net_client.dart';
+import 'package:fcc_home/vm/auth_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 import 'home_global.dart';
@@ -11,7 +13,31 @@ import 'home_global.dart';
  * user auth
  */
 class AuthPage extends StatefulWidget {
-  const AuthPage({Key? key}) : super(key: key);
+  var vm = AuthVM();
+
+  AuthPage({Key? key}) : super(key: key);
+
+  Future<void> loginAction(String name, String password,
+      void Function(String state) callback) async {
+    try {
+      await vm.sendLogin(name, password);
+    } catch (exp) {
+      print(exp);
+    } finally {
+      callback("");
+    }
+  }
+
+  Future<void> registerAction(String name, String password,
+      void Function(String state) callback) async {
+    try {
+      await vm.sendLogin(name, password);
+    } catch (exp) {
+      print(exp);
+    } finally {
+      callback("");
+    }
+  }
 
   @override
   State createState() {
@@ -20,6 +46,30 @@ class AuthPage extends StatefulWidget {
 }
 
 class AuthPageState extends State<AuthPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("login")),
+      body: Provider<LoginInfo>(
+        create: (context) => widget.vm.loginInfo,
+        child: AuthPageBody(login: widget.loginAction),
+      ),
+    );
+  }
+}
+
+class AuthPageBody extends StatefulWidget {
+  AuthPageBody({required this.login});
+
+  Function login;
+
+  @override
+  State<StatefulWidget> createState() {
+    return AuthPageBodyState();
+  }
+}
+
+class AuthPageBodyState extends State<AuthPageBody> {
   late TextEditingController authNameCtrl;
   late TextEditingController authPswCtrl;
 
@@ -31,7 +81,7 @@ class AuthPageState extends State<AuthPage> {
     try {
       _progressDialog.show(message: "请稍后");
       var loginStr =
-          await client.postLogin(authNameCtrl.text, authPswCtrl.text);
+      await client.postLogin(authNameCtrl.text, authPswCtrl.text);
       if (loginStr != null) {
         Map<String, dynamic> jsonObj = json.decode(loginStr);
         var loginInfo = LoginInfo.fromJson(jsonObj);
@@ -49,6 +99,11 @@ class AuthPageState extends State<AuthPage> {
     } finally {
       _progressDialog.hide();
     }
+
+    _progressDialog.show(message: "请稍候");
+    widget.login(
+        authNameCtrl.text, authPswCtrl.text, () => {_progressDialog.hide()});
+
     //todo if get token then jump into homepage
     setState(() {});
   }
