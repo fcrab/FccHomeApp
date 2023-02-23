@@ -1,17 +1,15 @@
-import 'dart:convert';
-
 import 'package:fcc_home/entity/login_info.dart';
-import 'package:fcc_home/net_client.dart';
 import 'package:fcc_home/vm/auth_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-import 'home_global.dart';
-
 /**
  * user auth
  */
+
+typedef TestAction = void Function(String name, String password);
+
 class AuthPage extends StatefulWidget {
   var vm = AuthVM();
 
@@ -39,6 +37,17 @@ class AuthPage extends StatefulWidget {
     }
   }
 
+  void testAction(
+      String name, String password, void Function(String state) callback) {
+    try {
+      // vm.sendTest(name, password);
+    } catch (exp) {
+      print(exp);
+    } finally {
+      callback("");
+    }
+  }
+
   @override
   State createState() {
     return AuthPageState();
@@ -50,18 +59,22 @@ class AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("login")),
-      body: Provider<LoginInfo>(
+      body: ChangeNotifierProvider<LoginInfo>(
         create: (context) => widget.vm.loginInfo,
-        child: AuthPageBody(login: widget.loginAction),
+        child: AuthPageBody(
+            login: widget.loginAction, register: widget.registerAction),
       ),
     );
   }
 }
 
 class AuthPageBody extends StatefulWidget {
-  AuthPageBody({required this.login});
-
+  AuthPageBody({Key? key, required this.login, required this.register})
+      : super(key: key);
+  var vm = AuthVM();
   Function login;
+
+  Function register;
 
   @override
   State<StatefulWidget> createState() {
@@ -75,31 +88,8 @@ class AuthPageBodyState extends State<AuthPageBody> {
 
   late SimpleFontelicoProgressDialog _progressDialog;
 
-  var client = NetClient();
 
   Future<void> sendLogin() async {
-    try {
-      _progressDialog.show(message: "请稍后");
-      var loginStr =
-      await client.postLogin(authNameCtrl.text, authPswCtrl.text);
-      if (loginStr != null) {
-        Map<String, dynamic> jsonObj = json.decode(loginStr);
-        var loginInfo = LoginInfo.fromJson(jsonObj);
-        HomeGlobal.saveAccessToken(loginInfo.id);
-        // if(result == true){
-        //
-        //   HomeGlobal.saveAccessToken(jsonObj['access']);
-        // }else{
-        //   print("login error:" +loginStr);
-        // }
-        // HomeGlobal.saveRefreshToken(jsonObj['refresh']);
-      }
-    } catch (exp) {
-      print(exp);
-    } finally {
-      _progressDialog.hide();
-    }
-
     _progressDialog.show(message: "请稍候");
     widget.login(
         authNameCtrl.text, authPswCtrl.text, () => {_progressDialog.hide()});
@@ -109,35 +99,40 @@ class AuthPageBodyState extends State<AuthPageBody> {
   }
 
   Future<void> sendRegister() async {
-    try {
-      _progressDialog.show(message: "请稍后");
-      // var info = LoginInfo.info(name:authNameCtrl.text,password: authPswCtrl.text);
-      var tokenMap = await client.register(authNameCtrl.text, authPswCtrl.text);
-      if (tokenMap != null) {
-        Map<String, dynamic> jsonObj = json.decode(tokenMap);
-        HomeGlobal.saveAccessToken(jsonObj['access']);
-        // HomeGlobal.saveRefreshToken(jsonObj['refresh']);
-      }
-    } catch (exp) {
-      print(exp);
-    } finally {
-      _progressDialog.hide();
-    }
-    //todo if get token then jump into homepage
+    _progressDialog.show(message: "请稍候");
+    widget.register(
+        authNameCtrl.text, authPswCtrl.text, () => {_progressDialog.hide()});
+
     setState(() {});
+  }
+
+  void sendTest(LoginInfo info) {
+    _progressDialog.show(message: "请稍候");
+    widget.vm.sendTest(authNameCtrl.text, authPswCtrl.text);
+    _progressDialog.hide();
+    // widget.test( authPswCtrl.text,()=>{
+    //   _progressDialog.hide()
+    // });
+
+    // setState(() {});
   }
 
   @override
   void initState() {
     _progressDialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
+
+    print("show me when you excute this function");
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("login")),
-      body: Center(
+    // LoginInfo id = Provider.of<LoginInfo>(context,listen: false);
+
+    return Consumer<LoginInfo>(builder: (_, info, child) {
+      print("id: ${info.id} name:${info.name} password:${info.password}");
+
+      return Center(
         child: Column(
           children: [
             const Text('账号'),
@@ -152,7 +147,9 @@ class AuthPageBodyState extends State<AuthPageBody> {
             ),
             TextButton(
                 onPressed: () {
-                  sendLogin();
+                  // sendLogin();
+                  // info.testNoti();
+                  sendTest(info);
                 },
                 child: const Text("登录")),
             TextButton(
@@ -162,7 +159,7 @@ class AuthPageBodyState extends State<AuthPageBody> {
                 child: const Text("注册")),
           ],
         ),
-      ),
-    );
+      );
+    });
   }
 }

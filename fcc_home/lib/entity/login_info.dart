@@ -2,15 +2,17 @@
 
 import 'dart:convert';
 
-class LoginInfo {
-  final String id;
-  final String name;
-  final String password;
-  final String salt;
-  final String email;
-  final String phoneNumber;
-  final int status;
-  final String lastUpdateTime;
+import 'package:flutter/material.dart';
+
+class LoginInfo with ChangeNotifier {
+  String id;
+  String name;
+  String password;
+  String salt;
+  String email;
+  String phoneNumber;
+  int status;
+  String lastUpdateTime;
 
   LoginInfo(
       {required this.id,
@@ -32,6 +34,25 @@ class LoginInfo {
     required this.name,
     required this.password,
   });
+
+  LoginInfo.test({
+    this.id = '11223',
+    this.email = '',
+    this.salt = '',
+    this.phoneNumber = '',
+    this.status = 1,
+    this.lastUpdateTime = '',
+    this.name = 'test1',
+    this.password = 'test11',
+  });
+
+  void testNoti() {
+    name = "aabcded";
+    password = "aabcded";
+    id = "aabcded";
+
+    notifyListeners();
+  }
 
   String toJson() {
     return json.encode(this);

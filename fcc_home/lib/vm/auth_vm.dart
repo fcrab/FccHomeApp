@@ -1,19 +1,24 @@
 import 'dart:convert';
 
 import 'package:fcc_home/entity/login_info.dart';
-import 'package:flutter/material.dart';
 
 import '../home_global.dart';
 import '../net_client.dart';
 
-class AuthVM with ChangeNotifier {
-  LoginInfo _loginInfo = LoginInfo.info(name: "", password: "");
+class AuthVM {
+  LoginInfo loginInfo = LoginInfo.info(name: "1122", password: "23212");
 
-  LoginInfo get loginInfo {
-    return _loginInfo;
-  }
+  // LoginInfo get loginInfo {
+  //   return _loginInfo;
+  // }
 
   var client = NetClient();
+
+  void sendTest(String userName, String password) {
+    // loginInfo = LoginInfo.test();
+    // loginInfo.notifyListeners();
+    loginInfo.testNoti();
+  }
 
   Future<void> sendLogin(userName, password) async {
     try {
@@ -21,12 +26,10 @@ class AuthVM with ChangeNotifier {
       var loginStr = await client.postLogin(userName, password);
       if (loginStr != null) {
         Map<String, dynamic> jsonObj = json.decode(loginStr);
-        _loginInfo = LoginInfo.fromJson(jsonObj);
-        if (_loginInfo != null) {
-          HomeGlobal.saveAccessToken(loginInfo!.id);
-        }
+        loginInfo = LoginInfo.fromJson(jsonObj);
+        HomeGlobal.saveAccessToken(loginInfo.id);
 
-        notifyListeners();
+        loginInfo.notifyListeners();
       }
     } catch (exp) {
       print(exp);
