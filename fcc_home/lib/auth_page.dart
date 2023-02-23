@@ -1,8 +1,12 @@
 import 'package:fcc_home/entity/login_info.dart';
 import 'package:fcc_home/vm/auth_vm.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+
+import 'home_global.dart';
+import 'home_page_widget.dart';
 
 /**
  * user auth
@@ -90,6 +94,34 @@ class AuthPageBodyState extends State<AuthPageBody> {
 
 
   Future<void> sendLogin() async {
+    try {
+      _progressDialog.show(message: "请稍后");
+      var loginStr =
+      await client.postLogin(authNameCtrl.text, authPswCtrl.text);
+      if (loginStr != null) {
+        Map<String, dynamic> jsonObj = json.decode(loginStr);
+        var loginInfo = LoginInfo.fromJson(jsonObj);
+        HomeGlobal.saveAccessToken(loginInfo.id);
+        // await Navigator.push(context, MaterialPageRoute(builder: (context)=> HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform)));
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomePageWidget(
+                    title: 'Home Page', platform: defaultTargetPlatform)));
+        // if(result == true){
+        //
+        //   HomeGlobal.saveAccessToken(jsonObj['access']);
+        // }else{
+        //   print("login error:" +loginStr);
+        // }
+        // HomeGlobal.saveRefreshToken(jsonObj['refresh']);
+      }
+    } catch (exp) {
+      print(exp);
+    } finally {
+      _progressDialog.hide();
+    }
+
     _progressDialog.show(message: "请稍候");
     widget.login(
         authNameCtrl.text, authPswCtrl.text, () => {_progressDialog.hide()});
