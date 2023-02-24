@@ -54,6 +54,18 @@ class LoginInfo with ChangeNotifier {
     notifyListeners();
   }
 
+  void refreshData(LoginInfo info) {
+    id = info.id;
+    name = info.name;
+    password = info.password;
+    salt = info.salt;
+    email = info.email;
+    phoneNumber = info.phoneNumber;
+    status = info.status;
+    lastUpdateTime = info.lastUpdateTime;
+    notifyListeners();
+  }
+
   String toJson() {
     return json.encode(this);
   }

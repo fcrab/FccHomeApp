@@ -5,24 +5,31 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-import 'home_global.dart';
 import 'home_page_widget.dart';
 
 /**
  * user auth
  */
 
-typedef TestAction = void Function(String name, String password);
+// typedef TestAction = void Function(String name, String password);
 
 class AuthPage extends StatefulWidget {
   var vm = AuthVM();
 
   AuthPage({Key? key}) : super(key: key);
 
-  Future<void> loginAction(String name, String password,
-      void Function(String state) callback) async {
+  Future<void> _loginAction(String name, String password) async {
     try {
       await vm.sendLogin(name, password);
+    } catch (exp) {
+      print(exp);
+    } finally {}
+  }
+
+  Future<void> _registerAction(String name, String password,
+      void Function(String state) callback) async {
+    try {
+      await vm.sendRegister(name, password);
     } catch (exp) {
       print(exp);
     } finally {
@@ -30,25 +37,15 @@ class AuthPage extends StatefulWidget {
     }
   }
 
-  Future<void> registerAction(String name, String password,
-      void Function(String state) callback) async {
-    try {
-      await vm.sendLogin(name, password);
-    } catch (exp) {
-      print(exp);
-    } finally {
-      callback("");
-    }
-  }
+  void _testAction(String name, String password) {
+    print("call test action from child");
 
-  void testAction(
-      String name, String password, void Function(String state) callback) {
     try {
-      // vm.sendTest(name, password);
+      vm.sendTest(name, password);
     } catch (exp) {
       print(exp);
     } finally {
-      callback("");
+      // callback("");
     }
   }
 
@@ -66,19 +63,28 @@ class AuthPageState extends State<AuthPage> {
       body: ChangeNotifierProvider<LoginInfo>(
         create: (context) => widget.vm.loginInfo,
         child: AuthPageBody(
-            login: widget.loginAction, register: widget.registerAction),
+            login: widget._loginAction,
+            register: widget._registerAction,
+            test: widget._testAction),
       ),
     );
   }
 }
 
 class AuthPageBody extends StatefulWidget {
-  AuthPageBody({Key? key, required this.login, required this.register})
-      : super(key: key);
   var vm = AuthVM();
   Function login;
 
   Function register;
+
+  Function test;
+
+  AuthPageBody(
+      {Key? key,
+      required this.login,
+      required this.register,
+      required this.test})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -91,63 +97,6 @@ class AuthPageBodyState extends State<AuthPageBody> {
   late TextEditingController authPswCtrl;
 
   late SimpleFontelicoProgressDialog _progressDialog;
-
-
-  Future<void> sendLogin() async {
-    try {
-      _progressDialog.show(message: "请稍后");
-      var loginStr =
-      await client.postLogin(authNameCtrl.text, authPswCtrl.text);
-      if (loginStr != null) {
-        Map<String, dynamic> jsonObj = json.decode(loginStr);
-        var loginInfo = LoginInfo.fromJson(jsonObj);
-        HomeGlobal.saveAccessToken(loginInfo.id);
-        // await Navigator.push(context, MaterialPageRoute(builder: (context)=> HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform)));
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => HomePageWidget(
-                    title: 'Home Page', platform: defaultTargetPlatform)));
-        // if(result == true){
-        //
-        //   HomeGlobal.saveAccessToken(jsonObj['access']);
-        // }else{
-        //   print("login error:" +loginStr);
-        // }
-        // HomeGlobal.saveRefreshToken(jsonObj['refresh']);
-      }
-    } catch (exp) {
-      print(exp);
-    } finally {
-      _progressDialog.hide();
-    }
-
-    _progressDialog.show(message: "请稍候");
-    widget.login(
-        authNameCtrl.text, authPswCtrl.text, () => {_progressDialog.hide()});
-
-    //todo if get token then jump into homepage
-    setState(() {});
-  }
-
-  Future<void> sendRegister() async {
-    _progressDialog.show(message: "请稍候");
-    widget.register(
-        authNameCtrl.text, authPswCtrl.text, () => {_progressDialog.hide()});
-
-    setState(() {});
-  }
-
-  void sendTest(LoginInfo info) {
-    _progressDialog.show(message: "请稍候");
-    widget.vm.sendTest(authNameCtrl.text, authPswCtrl.text);
-    _progressDialog.hide();
-    // widget.test( authPswCtrl.text,()=>{
-    //   _progressDialog.hide()
-    // });
-
-    // setState(() {});
-  }
 
   @override
   void initState() {
@@ -164,6 +113,19 @@ class AuthPageBodyState extends State<AuthPageBody> {
     return Consumer<LoginInfo>(builder: (_, info, child) {
       print("id: ${info.id} name:${info.name} password:${info.password}");
 
+      if (info.id != "") {
+        print("id has been refresh");
+        //需要在build后再执行
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          print("call after state build");
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomePageWidget(
+                      title: 'Home Page', platform: defaultTargetPlatform)));
+        });
+      }
+
       return Center(
         child: Column(
           children: [
@@ -179,14 +141,14 @@ class AuthPageBodyState extends State<AuthPageBody> {
             ),
             TextButton(
                 onPressed: () {
-                  // sendLogin();
-                  // info.testNoti();
-                  sendTest(info);
+                  widget.login(authNameCtrl.text, authPswCtrl.text);
+                  // widget.test(authNameCtrl.text,authPswCtrl.text);
                 },
                 child: const Text("登录")),
             TextButton(
                 onPressed: () {
-                  sendRegister();
+                  // sendRegister();
+                  widget.register(authNameCtrl.text, authPswCtrl.text);
                 },
                 child: const Text("注册")),
           ],
