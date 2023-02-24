@@ -2,6 +2,7 @@ import 'package:fcc_home/entity/login_info.dart';
 import 'package:fcc_home/vm/auth_vm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
@@ -124,6 +125,15 @@ class AuthPageBodyState extends State<AuthPageBody> {
                   builder: (context) => HomePageWidget(
                       title: 'Home Page', platform: defaultTargetPlatform)));
         });
+
+        //another way
+        SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+          //action in next frame
+          // print("action in schedule");
+        });
+
+        //another new way
+        Future.microtask(() => {});
       }
 
       return Center(
