@@ -78,7 +78,7 @@ class NetClient {
     return null;
   }
 
-  Future<String?> getServerPicsList(String token, String dir, int? page) async {
+  Future<String?> getServerPicsList(String token, int dir, int? page) async {
     String picListUrl = "files/listByPage";
     try {
       var map = {'user': token, 'folder': dir, 'page': page ?? 0};

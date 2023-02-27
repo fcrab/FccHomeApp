@@ -36,7 +36,7 @@ class ServerPageState extends State<ServerPageWidget>
       print('begin get file from server');
       _progressDialog.show(message: "请稍后");
 
-      var fileList = await client.getServerPicsList(HomeGlobal.token, '', page);
+      var fileList = await client.getServerPicsList(HomeGlobal.token, 0, page);
 
       if (fileList != null) {
         List<dynamic> jsonObj = json.decode(fileList);
