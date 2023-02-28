@@ -25,7 +25,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
   @override
   void initState() {
     print("demo page init state");
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (defaultTargetPlatform == TargetPlatform.android) {
         dynamic result = await platform.invokeMethod("requestPermission");
         print(result);
@@ -45,7 +45,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // _listenToEvent();
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {}
     });
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   void _incrementCounter() {

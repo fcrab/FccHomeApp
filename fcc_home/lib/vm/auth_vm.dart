@@ -24,16 +24,16 @@ class AuthVM {
 
   Future<void> sendLogin(userName, password) async {
     try {
-      var loginStr = await client.postLogin(userName, password);
-      if (loginStr != null) {
-        Map<String, dynamic> jsonObj = json.decode(loginStr);
-        var info = LoginInfo.fromJson(jsonObj);
-        HomeGlobal.saveAccessToken(info.id);
-        loginInfo.refreshData(info);
-      }
+      // var loginStr = await client.postLogin(userName, password);
+      // if (loginStr != null) {
+      //   Map<String, dynamic> jsonObj = json.decode(loginStr);
+      //   var info = LoginInfo.fromJson(jsonObj);
+      //   HomeGlobal.saveAccessToken(info.id);
+      //   loginInfo.refreshData(info);
+      // }
       //test
-      // loginInfo.refreshData(LoginInfo.test());
-      // HomeGlobal.saveAccessToken(loginInfo.id);
+      loginInfo.refreshData(LoginInfo.test());
+      HomeGlobal.saveAccessToken(loginInfo.id);
     } catch (exp) {
       print(exp);
     } finally {

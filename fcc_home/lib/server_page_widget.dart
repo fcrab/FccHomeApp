@@ -1,14 +1,13 @@
-import 'dart:convert';
-
-import 'package:fcc_home/home_global.dart';
+import 'package:fcc_home/vm/media_server_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
-
-import 'net_client.dart';
 
 /// 按日期排序，直接显示所有照片
 class ServerPageWidget extends StatefulWidget {
-  const ServerPageWidget({Key? key}) : super(key: key);
+  ServerPageWidget({Key? key}) : super(key: key);
+
+  MediaServerVM vm = MediaServerVM();
 
   @override
   State createState() {
@@ -20,6 +19,7 @@ class ServerPageState extends State<ServerPageWidget>
     with WidgetsBindingObserver {
   late SimpleFontelicoProgressDialog _progressDialog;
 
+/*
   var client = NetClient();
 
   Future<void> getDirs() async {
@@ -68,6 +68,7 @@ class ServerPageState extends State<ServerPageWidget>
     // 'https://www.zhifure.com/upload/images/2018/9/15212126838.jpg',
     // 'https://www.inbar.int/wp-content/uploads/2020/12/3.jpg'
   ];
+*/
 
   @override
   void initState() {
@@ -75,7 +76,7 @@ class ServerPageState extends State<ServerPageWidget>
     _progressDialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      getDirs();
+      // getDirs();
       // getPics();
     });
     WidgetsBinding.instance.addObserver(this);
@@ -83,17 +84,108 @@ class ServerPageState extends State<ServerPageWidget>
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(4),
-        itemCount: entries.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            padding: const EdgeInsets.only(top: 4),
-            child: Image.network(entries[index],
-                height: 300,
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.low),
-          );
-        });
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<DirInfos>(
+          create: (ctx) => widget.vm.dirs,
+        ),
+        ChangeNotifierProvider<FileInfos>(create: (ctv) => widget.vm.listInfo)
+      ],
+      child: PhotoWall(widget.vm.fetchUserDirs, widget.vm.fetchPicsData),
+    );
+  }
+}
+
+class PhotoWall extends StatefulWidget {
+  PhotoWall(this.getDirs, this.getNextPage);
+
+  bool isRoot = true;
+
+  int currentDir = -1;
+
+  Function getDirs;
+
+  // Function refreshFiles;
+
+  Function getNextPage;
+
+  @override
+  State<StatefulWidget> createState() {
+    return WallState();
+  }
+}
+
+class WallState extends State<PhotoWall> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isRoot) {
+      return Consumer<DirInfos>(
+          builder: (ctx, dirList, child) => ListView.builder(
+              padding: const EdgeInsets.all(4),
+              itemCount: dirList.dirs.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(dirList.dirs[index].name),
+                  ),
+                  onTap: () {
+                    widget.isRoot = false;
+                    widget.currentDir = dirList.dirs[index].id;
+                    widget.getNextPage(widget.currentDir);
+                    setState(() {});
+                  },
+                );
+              }));
+    } else {
+      return Consumer<FileInfos>(
+          builder: (ctx, fileList, child) => WillPopScope(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(4),
+                itemCount: fileList.dataList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  // if(index+1 == fileList.dataList.length){
+                  //   widget.getNextPage(widget.currentDir);
+                  // }
+                  return Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Image.network(fileList.dataList[index].url,
+                        height: 300,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.low),
+                  );
+                },
+                controller: _scrollController,
+              ),
+              onWillPop: () async {
+                widget.isRoot = true;
+                widget.currentDir = -1;
+                widget.getDirs();
+                setState(() {});
+                return false;
+              }));
+    }
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      widget.getDirs();
+    });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        print("get to the bottom");
+        widget.getNextPage(widget.currentDir);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
   }
 }
