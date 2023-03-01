@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
             HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
         "mine_page": (context) => MinePageWidget(),
         "server_page": (context) => ServerPageWidget(),
+        // "display_page":(context)=> DisplayPage(),
         // "auth": (context) => AuthPage()
         "/": (context) => AuthPage()
       },

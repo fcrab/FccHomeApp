@@ -1,3 +1,4 @@
+import 'package:fcc_home/display_page.dart';
 import 'package:fcc_home/vm/media_server_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -115,9 +116,9 @@ class WallState extends State<PhotoWall> {
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   title: Container(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(dirList.dirs[index].name),
-                      ),
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(dirList.dirs[index].name),
+                  ),
                   onTap: () {
                     initFileListFunc(dirList.dirs[index].id);
                   },
@@ -143,12 +144,20 @@ class WallState extends State<PhotoWall> {
             //   widget.getNextPage(widget.currentDir);
             // }
             return Container(
-              padding: const EdgeInsets.only(top: 4),
-              child: Image.network(fileList.dataList[index].url,
-                  height: 300,
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.low),
-            );
+                padding: const EdgeInsets.only(top: 4),
+                child: GestureDetector(
+                  child: Image.network(fileList.dataList[index].url,
+                      height: 300,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.low),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DisplayPage(
+                                test_url: fileList.dataList[index].url)));
+                  },
+                ));
           },
           controller: _scrollController,
         ),
