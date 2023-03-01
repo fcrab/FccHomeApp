@@ -19,37 +19,6 @@ class AuthPage extends StatefulWidget {
 
   AuthPage({Key? key}) : super(key: key);
 
-  Future<void> _loginAction(String name, String password) async {
-    try {
-      await vm.sendLogin(name, password);
-    } catch (exp) {
-      print(exp);
-    } finally {}
-  }
-
-  Future<void> _registerAction(String name, String password,
-      void Function(String state) callback) async {
-    try {
-      await vm.sendRegister(name, password);
-    } catch (exp) {
-      print(exp);
-    } finally {
-      callback("");
-    }
-  }
-
-  void _testAction(String name, String password) {
-    print("call test action from child");
-
-    try {
-      vm.sendTest(name, password);
-    } catch (exp) {
-      print(exp);
-    } finally {
-      // callback("");
-    }
-  }
-
   @override
   State createState() {
     return AuthPageState();
@@ -64,9 +33,9 @@ class AuthPageState extends State<AuthPage> {
       body: ChangeNotifierProvider<LoginInfo>(
         create: (context) => widget.vm.loginInfo,
         child: AuthPageBody(
-            login: widget._loginAction,
-            register: widget._registerAction,
-            test: widget._testAction),
+            login: widget.vm.sendLogin,
+            register: widget.vm.sendRegister,
+            verifyLocal: widget.vm.verifyLocal),
       ),
     );
   }
@@ -78,13 +47,13 @@ class AuthPageBody extends StatefulWidget {
 
   Function register;
 
-  Function test;
+  Function verifyLocal;
 
   AuthPageBody(
       {Key? key,
       required this.login,
       required this.register,
-      required this.test})
+      required this.verifyLocal})
       : super(key: key);
 
   @override
@@ -104,7 +73,22 @@ class AuthPageBodyState extends State<AuthPageBody> {
     _progressDialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
 
-    print("show me when you excute this function");
+    print("show me when you execute this function");
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      verifyLocal();
+    });
+  }
+
+  Future<void> verifyLocal() async {
+    _progressDialog.show(message: "正在校验信息,请稍候");
+    await widget.verifyLocal();
+    _progressDialog.hide();
+  }
+
+  Future<void> execute(Function func, name, psw) async {
+    _progressDialog.show(message: "正在通信,请稍候");
+    await func(name, psw);
+    _progressDialog.hide();
   }
 
   @override
@@ -151,14 +135,14 @@ class AuthPageBodyState extends State<AuthPageBody> {
             ),
             TextButton(
                 onPressed: () {
-                  widget.login(authNameCtrl.text, authPswCtrl.text);
-                  // widget.test(authNameCtrl.text,authPswCtrl.text);
+                  // widget.login(authNameCtrl.text, authPswCtrl.text);
+                  execute(widget.login, authNameCtrl.text, authPswCtrl.text);
                 },
                 child: const Text("登录")),
             TextButton(
                 onPressed: () {
-                  // sendRegister();
-                  widget.register(authNameCtrl.text, authPswCtrl.text);
+                  // widget.register(authNameCtrl.text, authPswCtrl.text);
+                  execute(widget.register, authNameCtrl.text, authPswCtrl.text);
                 },
                 child: const Text("注册")),
           ],

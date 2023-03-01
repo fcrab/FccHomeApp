@@ -11,14 +11,23 @@ class MediaServerVM {
 
   var client = NetClient();
 
-  Future<void> fetchUserDirs() async {
+  Future<bool> fetchUserDirs() async {
     // var dirList = await client.getServerDirList(HomeGlobal.token);
+    //
+    // print("fetchUserDirs gets result");
     // if (dirList != null) {
-    //   List listObj = json.decode(dirList);
-    //   var list = listObj.map((e) => FolderInfo.fromJson(e)).toList();
-    //   dirs.refresh(list);
+    //   try{
+    //     List listObj = json.decode(dirList);
+    //     var list = listObj.map((e) => FolderInfo.fromJson(e)).toList();
+    //     dirs.refresh(list);
+    //   }catch(exp){
+    //     print(exp.toString());
+    //     return false;
+    //   }
+    // }else{
+    //   return false;
     // }
-
+    // return true;
     //test
     dirs.refresh([
       FolderInfo(id: 1, name: "name1", parent: "", isUserBase: true),
@@ -26,9 +35,10 @@ class MediaServerVM {
       FolderInfo(id: 3, name: "test3", parent: "", isUserBase: false),
       FolderInfo(id: 4, name: "test5", parent: "", isUserBase: false)
     ]);
+    return true;
   }
 
-  Future<void> fetchPicsData(int dir) async {
+  Future<bool> fetchPicsData(int dir) async {
     // if (listInfo.page == 0) {
     //   var pager = await client.getServerPicsList(HomeGlobal.token, dir, 1);
     //   var data = FileInfos.fromJson(json.decode(pager!));
@@ -95,6 +105,7 @@ class MediaServerVM {
             lastModify: DateTime.now()),
       ]);
     }
+    return true;
   }
 }
 

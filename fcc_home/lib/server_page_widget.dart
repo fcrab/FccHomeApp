@@ -19,57 +19,6 @@ class ServerPageState extends State<ServerPageWidget>
     with WidgetsBindingObserver {
   late SimpleFontelicoProgressDialog _progressDialog;
 
-/*
-  var client = NetClient();
-
-  Future<void> getDirs() async {
-    try {
-      var dirList = await client.getServerDirList(HomeGlobal.token);
-      print(dirList);
-    } catch (exp) {
-      print(exp);
-    }
-  }
-
-  Future<void> getPics() async {
-    try {
-      print('begin get file from server');
-      _progressDialog.show(message: "请稍后");
-
-      var fileList = await client.getServerPicsList(HomeGlobal.token, 0, page);
-
-      if (fileList != null) {
-        List<dynamic> jsonObj = json.decode(fileList);
-        for (Map<String, dynamic> obj in jsonObj) {
-          if (!obj['filepath'].toString().endsWith(".mov")) {
-            entries.add(obj['filepath']);
-          }
-        }
-        // HomeGlobal.saveAccessToken(jsonObj['access']);
-        // HomeGlobal.saveRefreshToken(jsonObj['refresh']);
-      }
-    } catch (exp) {
-      print(exp);
-    } finally {
-      _progressDialog.hide();
-    }
-    //todo if get token then jump into homepage
-    setState(() {});
-  }
-
-  int size = 0;
-
-  int page = 0;
-
-  int total = 0;
-
-  List<String> entries = [
-    // 'https://img1.mydrivers.com/img/20210329/209025c28e7c443bb6e070c39b6574b9.png',
-    // 'https://www.zhifure.com/upload/images/2018/9/15212126838.jpg',
-    // 'https://www.inbar.int/wp-content/uploads/2020/12/3.jpg'
-  ];
-*/
-
   @override
   void initState() {
     print("server page init");
@@ -103,6 +52,10 @@ class PhotoWall extends StatefulWidget {
 
   int currentDir = -1;
 
+  int index = 0;
+
+  int total = 0;
+
   Function getDirs;
 
   // Function refreshFiles;
@@ -116,7 +69,41 @@ class PhotoWall extends StatefulWidget {
 }
 
 class WallState extends State<PhotoWall> {
+  late SimpleFontelicoProgressDialog _progressDialog;
+
   final ScrollController _scrollController = ScrollController();
+
+  Future<void> getDirsFunc() async {
+    _progressDialog.show(message: "正在初始化文件夹");
+    bool succeed = await widget.getDirs();
+    print("call fetchUserDirs ended");
+    _progressDialog.hide();
+    if (succeed) {
+      widget.isRoot = true;
+      widget.currentDir = -1;
+      setState(() {});
+    }
+  }
+
+  Future<void> initFileListFunc(dir) async {
+    _progressDialog.show(message: "正在获取文件列表");
+    bool succeed = await widget.getNextPage(dir);
+    _progressDialog.hide();
+    if (succeed) {
+      widget.isRoot = false;
+      widget.currentDir = dir;
+      setState(() {});
+    }
+  }
+
+  Future<void> getNextPage() async {
+    print("get next page index:${widget.index},total:${widget.total}");
+    if (widget.index < widget.total) {
+      _progressDialog.show(message: "正在获取更多文件");
+      widget.getNextPage(widget.currentDir);
+      _progressDialog.hide();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,58 +115,64 @@ class WallState extends State<PhotoWall> {
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   title: Container(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(dirList.dirs[index].name),
-                  ),
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(dirList.dirs[index].name),
+                      ),
                   onTap: () {
-                    widget.isRoot = false;
-                    widget.currentDir = dirList.dirs[index].id;
-                    widget.getNextPage(widget.currentDir);
-                    setState(() {});
+                    initFileListFunc(dirList.dirs[index].id);
                   },
                 );
               }));
     } else {
       return Consumer<FileInfos>(
-          builder: (ctx, fileList, child) => WillPopScope(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(4),
-                itemCount: fileList.dataList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  // if(index+1 == fileList.dataList.length){
-                  //   widget.getNextPage(widget.currentDir);
-                  // }
-                  return Container(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Image.network(fileList.dataList[index].url,
-                        height: 300,
-                        fit: BoxFit.cover,
-                        filterQuality: FilterQuality.low),
-                  );
-                },
-                controller: _scrollController,
-              ),
-              onWillPop: () async {
-                widget.isRoot = true;
-                widget.currentDir = -1;
-                widget.getDirs();
-                setState(() {});
-                return false;
-              }));
+        builder: buildList,
+      );
     }
+  }
+
+  Widget buildList(BuildContext context, FileInfos fileList, Widget? child) {
+    widget.index = fileList.dataList.length;
+    widget.total = fileList.total;
+    print("build list :itemcount:${widget.index} total:${widget.total}");
+    return WillPopScope(
+        child: ListView.builder(
+          padding: const EdgeInsets.all(4),
+          itemCount: fileList.dataList.length,
+          itemBuilder: (BuildContext context, int index) {
+            // if(index+1 == fileList.dataList.length){
+            //   widget.getNextPage(widget.currentDir);
+            // }
+            return Container(
+              padding: const EdgeInsets.only(top: 4),
+              child: Image.network(fileList.dataList[index].url,
+                  height: 300,
+                  fit: BoxFit.cover,
+                  filterQuality: FilterQuality.low),
+            );
+          },
+          controller: _scrollController,
+        ),
+        onWillPop: () async {
+          getDirsFunc();
+
+          return false;
+        });
   }
 
   @override
   void initState() {
+    _progressDialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      widget.getDirs();
+      getDirsFunc();
     });
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         print("get to the bottom");
-        widget.getNextPage(widget.currentDir);
+        getNextPage();
       }
     });
   }

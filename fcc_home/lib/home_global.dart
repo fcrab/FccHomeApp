@@ -10,7 +10,7 @@ class HomeGlobal {
   static saveAccessToken(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("token", value);
-    _getLocalToken();
+    getLocalToken();
   }
 
   static saveRefreshToken(String value) async {
@@ -18,7 +18,7 @@ class HomeGlobal {
     prefs.setString("refresh", value);
   }
 
-  static _getLocalToken() async {
+  static getLocalToken() async {
     String? result = "";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     result = prefs.getString("token");
