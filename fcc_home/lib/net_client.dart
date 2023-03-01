@@ -106,8 +106,14 @@ class NetClient {
   String? parseResult(Response response) {
     if (response.statusCode == 200) {
       print(response.data);
-      var result = response.data['result'];
-      var content = jsonEncode(response.data['content']);
+      late Map<String, dynamic> data;
+      if (response.data is String) {
+        data = json.decode(response.data);
+      } else {
+        data = response.data;
+      }
+      var result = data['result'];
+      var content = jsonEncode(data['content']);
       if (result == true) {
         return content;
       } else {

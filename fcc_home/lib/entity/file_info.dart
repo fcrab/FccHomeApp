@@ -20,8 +20,11 @@ class FileInfo {
         name: dataMap['name'],
         url: dataMap['url'],
         md5: dataMap['md5'],
-        createTime: DateTime.parse(dataMap['createTime']),
-        lastModify: DateTime.parse(dataMap['lastModify']));
+        createTime: DateTime.now(),
+        lastModify: DateTime.now());
+
+    // createTime: DateTime.parse(dataMap['createTime']),
+    // lastModify: DateTime.parse(dataMap['lastModify']));
   }
 
   FileInfo.name(
