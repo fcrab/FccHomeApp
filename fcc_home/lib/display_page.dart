@@ -19,6 +19,8 @@ class DisplayPageState extends State<DisplayPage> {
       appBar: AppBar(title: const Text("display")),
       body: ExtendedImage.network(
         widget.test_url,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         // width: ScreenUtil.instance.setWidth(400),
         // height: ScreenUtil.instance.setWidth(400),
         fit: BoxFit.contain,
