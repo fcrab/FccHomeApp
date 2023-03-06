@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'display_page.dart';
+
 class MinePageWidget extends StatefulWidget {
   MinePageWidget({Key? key}) : super(key: key);
 
@@ -73,11 +75,22 @@ class MinePageState extends State<MinePageWidget> {
         return Container(
             // child: Center(child: Image.network(entries[index])),
             padding: const EdgeInsets.all(4),
-            child: Image(
-              image: FileImage(File(entries[index]), scale: 0.1),
-              height: 150,
-              fit: BoxFit.cover,
-              filterQuality: FilterQuality.low,
+            child: GestureDetector(
+              child: Image(
+                image: FileImage(File(entries[index]), scale: 0.1),
+                height: 150,
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.low,
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DisplayPage(
+                              url: entries,
+                              index: index,
+                            )));
+              },
             )
 
             // child: Image.file(File(entries[index]),

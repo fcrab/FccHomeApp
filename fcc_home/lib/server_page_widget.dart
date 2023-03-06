@@ -1,4 +1,3 @@
-import 'package:fcc_home/display_page.dart';
 import 'package:fcc_home/vm/media_server_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -151,11 +150,11 @@ class WallState extends State<PhotoWall> {
                       fit: BoxFit.cover,
                       filterQuality: FilterQuality.low),
                   onTap: () {
-                    Navigator.push(
+/*                    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => DisplayPage(
-                                test_url: fileList.dataList[index].url)));
+                                test_url: fileList.dataList[index].url)));*/
                   },
                 ));
           },
