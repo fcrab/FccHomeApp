@@ -163,3 +163,23 @@ class FileInfos with ChangeNotifier {
             .toList());
   }
 }
+
+class MediaInfo {
+  bool isDir = false;
+  FolderInfo? folder;
+  FileInfo? file;
+}
+
+class MediaInfos with ChangeNotifier {
+  List<MediaInfo> list = [];
+  DirInfos dirInfos = DirInfos();
+  FileInfos fileInfos = FileInfos.empty();
+
+  void refreshDir() {
+    notifyListeners();
+  }
+
+  void refreshFiles() {
+    notifyListeners();
+  }
+}
