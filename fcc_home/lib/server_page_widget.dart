@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
+import 'display_page.dart';
+
 /// 按日期排序，直接显示所有照片
 class ServerPageWidget extends StatefulWidget {
   ServerPageWidget({Key? key}) : super(key: key);
@@ -35,26 +37,32 @@ class ServerPageState extends State<ServerPageWidget>
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<DirInfos>(
-          create: (ctx) => widget.vm.dirs,
-        ),
-        ChangeNotifierProvider<FileInfos>(create: (ctv) => widget.vm.listInfo)
+        // ChangeNotifierProvider<DirInfos>(
+        //   create: (ctx) => widget.vm.dirs,
+        // ),
+        // ChangeNotifierProvider<FileInfos>(create: (ctv) => widget.vm.listInfo),
+        ChangeNotifierProvider<MediaInfos>(create: (ctx) => widget.vm.infos)
       ],
-      child: PhotoWall(widget.vm.fetchUserDirs, widget.vm.fetchPicsData),
+      child: PhotoWall(widget.vm.fetchUserDataInDir, widget.vm.fetchUserDirs,
+          widget.vm.fetchPicsData),
     );
   }
 }
 
 class PhotoWall extends StatefulWidget {
-  PhotoWall(this.getDirs, this.getNextPage);
+  PhotoWall(this.getDirAndFiles, this.getDirs, this.getNextPage);
 
   bool isRoot = true;
 
-  int currentDir = -1;
+  String upperDir = '';
+
+  String currentDir = '';
 
   int index = 0;
 
   int total = 0;
+
+  Function getDirAndFiles;
 
   Function getDirs;
 
@@ -73,17 +81,33 @@ class WallState extends State<PhotoWall> {
 
   final ScrollController _scrollController = ScrollController();
 
-  Future<void> getDirsFunc() async {
+  Future<void> getCurrentDirs(dir) async {
     _progressDialog.show(message: "正在初始化文件夹");
-    bool succeed = await widget.getDirs();
-    print("call fetchUserDirs ended");
+
+    bool succeed = await widget.getDirAndFiles();
+    print("call fetch Dir and Files");
     _progressDialog.hide();
     if (succeed) {
-      widget.isRoot = true;
-      widget.currentDir = -1;
-      setState(() {});
+      if (dir != null && dir != '') {
+        widget.upperDir = widget.currentDir;
+      } else {
+        widget.upperDir = '';
+      }
+      widget.currentDir = dir;
     }
   }
+
+  // Future<void> getDirsFunc() async {
+  //   _progressDialog.show(message: "正在初始化文件夹");
+  //   bool succeed = await widget.getDirs();
+  //   print("call fetchUserDirs ended");
+  //   _progressDialog.hide();
+  //   if (succeed) {
+  //     widget.isRoot = true;
+  //     widget.currentDir = -1;
+  //     setState(() {});
+  //   }
+  // }
 
   Future<void> initFileListFunc(dir) async {
     _progressDialog.show(message: "正在获取文件列表");
@@ -107,6 +131,10 @@ class WallState extends State<PhotoWall> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<MediaInfos>(
+      builder: buildMediaList,
+    );
+
     if (widget.isRoot) {
       return Consumer<DirInfos>(
           builder: (ctx, dirList, child) => ListView.builder(
@@ -117,9 +145,9 @@ class WallState extends State<PhotoWall> {
                   title: Container(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(dirList.dirs[index].name),
-                  ),
-                  onTap: () {
-                    initFileListFunc(dirList.dirs[index].id);
+                      ),
+                      onTap: () {
+                        initFileListFunc(dirList.dirs[index].id);
                   },
                 );
               }));
@@ -130,7 +158,65 @@ class WallState extends State<PhotoWall> {
     }
   }
 
-  Widget buildList(BuildContext context, FileInfos fileList, Widget? child) {
+  Widget buildMediaList(
+      BuildContext context, MediaInfos mediaList, Widget? child) {
+    widget.index = mediaList.list.length;
+    widget.total = mediaList.getTotal();
+    print("build list :itemcount:${widget.index} total:${widget.total}");
+    return WillPopScope(
+        child: ListView.builder(
+          padding: const EdgeInsets.all(4),
+          itemCount: mediaList.list.length,
+          itemBuilder: (BuildContext context, int index) {
+            // if(index+1 == fileList.dataList.length){
+            //   widget.getNextPage(widget.currentDir);
+            // }
+            if (mediaList.list[index].isDir) {
+              return ListTile(
+                title: Container(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(mediaList.list[index].folder!.name),
+                ),
+                onTap: () {
+                  initFileListFunc(mediaList.list[index].folder!.id);
+                },
+              );
+            } else {
+              return Container(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: GestureDetector(
+                    child: Image.network(mediaList.list[index].file!.url,
+                        height: 300,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.low),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DisplayPage(
+                                    url: mediaList.fileInfos.dataList
+                                        .map((e) => e.url)
+                                        .toList(),
+                                    index:
+                                        index - mediaList.dirInfos.dirs.length,
+                                  )));
+                    },
+                  ));
+            }
+          },
+          controller: _scrollController,
+        ),
+        onWillPop: () async {
+          //返回刷新
+          //需要被优化
+          getCurrentDirs(widget.upperDir);
+          // getDirsFunc();
+
+          return false;
+        });
+  }
+
+/*  Widget buildList(BuildContext context, FileInfos fileList, Widget? child) {
     widget.index = fileList.dataList.length;
     widget.total = fileList.total;
     print("build list :itemcount:${widget.index} total:${widget.total}");
@@ -150,11 +236,11 @@ class WallState extends State<PhotoWall> {
                       fit: BoxFit.cover,
                       filterQuality: FilterQuality.low),
                   onTap: () {
-/*                    Navigator.push(
+*/ /*                    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => DisplayPage(
-                                test_url: fileList.dataList[index].url)));*/
+                                test_url: fileList.dataList[index].url)));*/ /*
                   },
                 ));
           },
@@ -165,7 +251,7 @@ class WallState extends State<PhotoWall> {
 
           return false;
         });
-  }
+  }*/
 
   @override
   void initState() {
@@ -173,7 +259,8 @@ class WallState extends State<PhotoWall> {
         context: context, barrierDimisable: false);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      getDirsFunc();
+      getCurrentDirs(widget.currentDir);
+      // getDirsFunc();
     });
 
     _scrollController.addListener(() {
