@@ -43,7 +43,7 @@ dependencies:
   simple_fontellico_progress_dialog: ^0.2.1
   image_picker: ^0.8.5+3
   provider: ^6.0.5
-  extended_image: ^4.0.0
+  extended_image: ^6.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
