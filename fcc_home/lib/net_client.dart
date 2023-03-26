@@ -91,10 +91,11 @@ class NetClient {
     return null;
   }
 
-  Future<String?> getServerDirList(String token, String parent) async {
-    String dirListUrl = "folder/list";
+  Future<String?> getServerDirList(String token, int parent) async {
+    String dirListUrl = "folder/expand";
     try {
-      var map = {'id': token, 'parent': parent};
+      var map = {'userId': token, 'folderId': parent};
+      print("get Server Dir :$map");
       var response = await dio.get(baseUrl + dirListUrl, queryParameters: map);
       return parseResult(response);
     } catch (exp) {

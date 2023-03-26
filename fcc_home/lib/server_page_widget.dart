@@ -49,14 +49,34 @@ class ServerPageState extends State<ServerPageWidget>
   }
 }
 
+class FolderStack {
+  List<int> folder = [];
+
+  void push(dir) {
+    if (folder.isEmpty || dir != folder.last) {
+      folder.add(dir);
+    }
+  }
+
+  int pop() {
+    try {
+      var top = folder.last;
+      folder.removeLast();
+      return top;
+    } catch (exp) {
+      return -1;
+    }
+  }
+}
+
 class PhotoWall extends StatefulWidget {
   PhotoWall(this.getDirAndFiles, this.getDirs, this.getNextPage);
 
   bool isRoot = true;
 
-  String upperDir = '';
+  var upperDir = FolderStack();
 
-  String currentDir = '';
+  int currentDir = -1;
 
   int index = 0;
 
@@ -84,16 +104,36 @@ class WallState extends State<PhotoWall> {
   Future<void> getCurrentDirs(dir) async {
     _progressDialog.show(message: "正在初始化文件夹");
 
-    bool succeed = await widget.getDirAndFiles();
+    bool succeed = await widget.getDirAndFiles(dir);
     print("call fetch Dir and Files");
     _progressDialog.hide();
     if (succeed) {
-      if (dir != null && dir != '') {
-        widget.upperDir = widget.currentDir;
-      } else {
-        widget.upperDir = '';
-      }
+      widget.upperDir.push(widget.currentDir);
+
+      // if (dir != null && dir != -1) {
+      //   widget.upperDir = widget.currentDir;
+      // } else {
+      //   widget.upperDir = -1;
+      // }
       widget.currentDir = dir;
+      print("upper: ${widget.upperDir.folder} current: ${widget.currentDir}");
+    }
+  }
+
+  Future<void> backToTop(dir) async {
+    _progressDialog.show(message: "正在初始化文件夹");
+
+    bool succeed = await widget.getDirAndFiles(dir);
+    print("call fetch Dir and Files");
+    _progressDialog.hide();
+    if (succeed) {
+      // if (dir != null && dir != -1) {
+      //   widget.upperDir = widget.currentDir;
+      // } else {
+      //   widget.upperDir = -1;
+      // }
+      widget.currentDir = dir;
+      print("upper: ${widget.upperDir.folder} current: ${widget.currentDir}");
     }
   }
 
@@ -109,16 +149,16 @@ class WallState extends State<PhotoWall> {
   //   }
   // }
 
-  Future<void> initFileListFunc(dir) async {
-    _progressDialog.show(message: "正在获取文件列表");
-    bool succeed = await widget.getNextPage(dir);
-    _progressDialog.hide();
-    if (succeed) {
-      widget.isRoot = false;
-      widget.currentDir = dir;
-      setState(() {});
-    }
-  }
+  // Future<void> initFileListFunc(dir) async {
+  //   _progressDialog.show(message: "正在获取文件列表");
+  //   bool succeed = await widget.getNextPage(dir);
+  //   _progressDialog.hide();
+  //   if (succeed) {
+  //     widget.isRoot = false;
+  //     widget.currentDir = dir;
+  //     setState(() {});
+  //   }
+  // }
 
   Future<void> getNextPage() async {
     print("get next page index:${widget.index},total:${widget.total}");
@@ -135,7 +175,7 @@ class WallState extends State<PhotoWall> {
       builder: buildMediaList,
     );
 
-    if (widget.isRoot) {
+/*    if (widget.isRoot) {
       return Consumer<DirInfos>(
           builder: (ctx, dirList, child) => ListView.builder(
               padding: const EdgeInsets.all(4),
@@ -155,7 +195,7 @@ class WallState extends State<PhotoWall> {
       return Consumer<FileInfos>(
         builder: buildList,
       );
-    }
+    }*/
   }
 
   Widget buildMediaList(
@@ -178,7 +218,8 @@ class WallState extends State<PhotoWall> {
                   child: Text(mediaList.list[index].folder!.name),
                 ),
                 onTap: () {
-                  initFileListFunc(mediaList.list[index].folder!.id);
+                  // initFileListFunc(mediaList.list[index].folder!.id);
+                  getCurrentDirs(mediaList.list[index].folder!.id);
                 },
               );
             } else {
@@ -209,7 +250,7 @@ class WallState extends State<PhotoWall> {
         onWillPop: () async {
           //返回刷新
           //需要被优化
-          getCurrentDirs(widget.upperDir);
+          backToTop(widget.upperDir.pop());
           // getDirsFunc();
 
           return false;
