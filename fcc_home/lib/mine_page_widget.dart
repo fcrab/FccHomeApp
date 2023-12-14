@@ -1,45 +1,67 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'display_page.dart';
+import 'home_global.dart';
 
 class MinePageWidget extends StatefulWidget {
-  MinePageWidget({Key? key}) : super(key: key);
-
-  final List<String> pics = [];
-
-  void setList(List<String> picList) {
-    pics.clear();
-    pics.addAll(picList);
-    // pics = picList;
-    print("update page list");
-    state.updatePics(pics);
-  }
-
-  MinePageState state = MinePageState([]);
+  const MinePageWidget({Key? key}) : super(key: key);
 
   @override
   State createState() {
-    print("init page state");
-    return state = MinePageState(pics);
+    return MinePageState();
   }
 }
 
-class MinePageState extends State<MinePageWidget> {
-  MinePageState(this.entries) : super();
+class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
+  MinePageState() : super();
 
   List<String> entries = [];
 
+  @override
+  void initState() {
+    print("demo page init state");
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        dynamic result =
+            await HomeGlobal.platform.invokeMethod("requestPermission");
+        print(result);
+        if (result == true) {
+          print("next step");
+          dynamic pics =
+              await HomeGlobal.platform.invokeListMethod("getAllPics");
+          // print(pics);
+          List<String> picsPath = [];
+          for (String pic in pics) {
+            Map<String, dynamic> picsMap = json.decode(pic);
+            // print(picsMap['data']);
+            picsPath.add(picsMap['data']);
+          }
+          setState(() {
+            entries = picsPath;
+          });
+
+          // (_pageWidget[0] as MinePageWidget).setList(picsPath);
+        }
+        // _initApp();
+        // _listenToEvent();
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {}
+    });
+    WidgetsBinding.instance.addObserver(this);
+  }
+
   void updatePics(List<String> pathList) {
-    print("update state" + pathList.length.toString());
+    print("update state${pathList.length}");
     // entries.clear();
     // entries.addAll(pathList);
     entries = pathList;
-    print("update entries" + entries.length.toString());
+    print("update entries${entries.length}");
     setState(() {
-      print("update state" + entries.length.toString());
+      print("update state${entries.length}");
     });
   }
 
@@ -48,32 +70,13 @@ class MinePageState extends State<MinePageWidget> {
     return images;
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return ListView.builder(
-  //       padding: const EdgeInsets.all(4),
-  //       itemCount: entries.length,
-  //       itemBuilder: (BuildContext context, int index) {
-  //         return Container(
-  //             // child: Center(child: Image.network(entries[index])),
-  //             padding: const EdgeInsets.only(top: 4),
-  //             // child: Center(
-  //             child: Image.file(File(entries[index]),
-  //                 fit: BoxFit.cover,
-  //                 height: 150,
-  //                 filterQuality: FilterQuality.low)
-  //             // ),
-  //             );
-  //       });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
       children: List.generate(entries.length, (index) {
         return Container(
-            // child: Center(child: Image.network(entries[index])),
+          // child: Center(child: Image.network(entries[index])),
             padding: const EdgeInsets.all(4),
             child: GestureDetector(
               child: Image(
@@ -87,18 +90,18 @@ class MinePageState extends State<MinePageWidget> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => DisplayPage(
-                              url: entries,
-                              index: index,
-                            )));
+                          url: entries,
+                          index: index,
+                        )));
               },
             )
 
-            // child: Image.file(File(entries[index]),
-            //     fit: BoxFit.cover,
-            //     height: 150,
-            //     filterQuality: FilterQuality.low)
+          // child: Image.file(File(entries[index]),
+          //     fit: BoxFit.cover,
+          //     height: 150,
+          //     filterQuality: FilterQuality.low)
 
-            );
+        );
       }),
     );
 
@@ -112,7 +115,7 @@ class MinePageState extends State<MinePageWidget> {
         itemCount: entries.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
-              // child: Center(child: Image.network(entries[index])),
+            // child: Center(child: Image.network(entries[index])),
               padding: const EdgeInsets.only(top: 4),
               // child: Center(
               child: Image.file(File(entries[index]),

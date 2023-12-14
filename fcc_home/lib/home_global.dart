@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'entity/login_info.dart';
@@ -6,6 +7,8 @@ class HomeGlobal {
   static LoginInfo? loginInfo;
 
   static String token = "";
+
+  static const platform = MethodChannel("com.crabfibber.fcc_home/event");
 
   static saveAccessToken(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

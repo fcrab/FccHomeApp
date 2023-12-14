@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 
 class NetClient {
   Dio dio = new Dio();
 
   NetClient() : super() {
-    dio.options.connectTimeout = 10 * 1000;
-    dio.options.receiveTimeout = 10 * 1000;
+    dio.options.connectTimeout = const Duration(seconds: 20);
+    dio.options.receiveTimeout = const Duration(seconds: 20);
     dio.options.contentType = Headers.jsonContentType;
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (client) {
@@ -25,7 +25,8 @@ class NetClient {
   }
 
   // String baseUrl = "http://172.16.73.222:8080/";
-  String baseUrl = "http://172.16.0.18:8080/";
+  // String baseUrl = "http://172.16.0.18:8080/";
+  String baseUrl = "http://192.168.31.205:8080/";
 
   Future<String?> register(String name, String psw) async {
     String authUrl = "auth/create";

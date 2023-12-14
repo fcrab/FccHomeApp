@@ -1,6 +1,7 @@
 buildscript {
-    ext.kotlin_version = '1.6.20'
+    ext.kotlin_version = '1.7.10'
     repositories {
+        maven { url 'https://mirrors.cernet.edu.cn/flutter/download.flutter.io' }
         maven {
             url 'https://maven.aliyun.com/repository/google/'
         }
@@ -8,18 +9,23 @@ buildscript {
             url 'https://maven.aliyun.com/repository/jcenter/'
         }
         maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
-        google()
-        mavenCentral()
+//        maven{
+//            url 'https://maven.aliyun.com/repository/gradle-plugin/'
+//        }
+
+//        google()
+//        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:7.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 allprojects {
     repositories {
+        maven { url 'https://mirrors.cernet.edu.cn/flutter/download.flutter.io' }
         maven {
             url 'https://maven.aliyun.com/repository/google/'
         }
@@ -27,8 +33,11 @@ allprojects {
             url 'https://maven.aliyun.com/repository/jcenter/'
         }
         maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
-        google()
-        mavenCentral()
+//        maven{
+//            url 'https://maven.aliyun.com/repository/gradle-plugin/'
+//        }
+//        google()
+//        mavenCentral()
     }
 }
 
@@ -38,6 +47,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,32 +19,6 @@ class _HomePageWidgetState extends State<HomePageWidget>
   _HomePageWidgetState(this.defaultTargetPlatform) : super();
   static const platform = MethodChannel("com.crabfibber.fcc_home/event");
   final TargetPlatform defaultTargetPlatform;
-
-  @override
-  void initState() {
-    print("demo page init state");
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        dynamic result = await platform.invokeMethod("requestPermission");
-        print(result);
-        if (result == true) {
-          print("next step");
-          dynamic pics = await platform.invokeListMethod("getAllPics");
-          // print(pics);
-          List<String> picsPath = [];
-          for (String pic in pics) {
-            Map<String, dynamic> picsMap = json.decode(pic);
-            // print(picsMap['data']);
-            picsPath.add(picsMap['data']);
-          }
-          (_pageWidget[0] as MinePageWidget).setList(picsPath);
-        }
-        // _initApp();
-        // _listenToEvent();
-      } else if (defaultTargetPlatform == TargetPlatform.iOS) {}
-    });
-    WidgetsBinding.instance.addObserver(this);
-  }
 
   void _incrementCounter() {
     setState(() {});

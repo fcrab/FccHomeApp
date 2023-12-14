@@ -43,7 +43,8 @@ class DisplayPageState extends State<DisplayPage> {
   Widget build(BuildContext context) {
     var children = <Widget>[];
     for (int count = 0; count < widget.url.length; count++) {
-      children.add(PageImgWidget(type: ImgType.LOCAL, url: widget.url[count]));
+      children
+          .add(PageImgWidget(type: ImgType.NETWORK, url: widget.url[count]));
     }
 
     return Scaffold(

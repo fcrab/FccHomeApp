@@ -29,7 +29,7 @@ class AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("login")),
+      appBar: AppBar(title: const Text("欢迎使用Lin云")),
       body: ChangeNotifierProvider<LoginInfo>(
         create: (context) => widget.vm.loginInfo,
         child: AuthPageBody(
@@ -42,7 +42,7 @@ class AuthPageState extends State<AuthPage> {
 }
 
 class AuthPageBody extends StatefulWidget {
-  var vm = AuthVM();
+  // var vm = AuthVM();
   Function login;
 
   Function register;
@@ -107,7 +107,7 @@ class AuthPageBodyState extends State<AuthPageBody> {
               context,
               MaterialPageRoute(
                   builder: (context) => HomePageWidget(
-                      title: 'Home Page', platform: defaultTargetPlatform)));
+                      title: 'Lin云相册', platform: defaultTargetPlatform)));
         });
 
         //another way
@@ -122,16 +122,25 @@ class AuthPageBodyState extends State<AuthPageBody> {
 
       return Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text('账号'),
-            TextField(
-              controller: authNameCtrl = TextEditingController(text: ""),
-              maxLines: 1,
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(left: 50, right: 50, bottom: 20),
+              child: TextField(
+                controller: authNameCtrl = TextEditingController(text: ""),
+                maxLines: 1,
+              ),
             ),
             const Text('密码'),
-            TextField(
-              controller: authPswCtrl = TextEditingController(text: ""),
-              maxLines: 1,
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(left: 50, right: 50, bottom: 20),
+              child: TextField(
+                controller: authPswCtrl = TextEditingController(text: ""),
+                maxLines: 1,
+              ),
             ),
             TextButton(
                 onPressed: () {

@@ -1,4 +1,3 @@
-//{"id":6,"name":"at2","password":"0000","salt":"","email":"0000at1@ggg.com","phoneNumber":"00001","status":1,"lastUpdateTime":"Jan 5, 2023, 12:00:00 AM"}
 
 import 'dart:convert';
 

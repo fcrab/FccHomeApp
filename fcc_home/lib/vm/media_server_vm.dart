@@ -191,7 +191,7 @@ class FileInfos {
   void refresh(FileInfos newData) {
     dataList = newData.dataList;
     total = newData.total;
-    page = newData.page;
+    page = newData.page + 1;
     size = newData.size;
     // notifyListeners();
   }
