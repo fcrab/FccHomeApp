@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
+import 'package:fcc_home/vm/detail_virtual_vm.dart';
 import 'package:fcc_home/vm/display_page_vm.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class DisplayPage extends StatefulWidget {
 
   ImgType mode = ImgType.NETWORK;
 
-  DisplayVM vm = DisplayVM();
+  late DisplayVM vm;
 
   // List<String> url = [];
 
@@ -22,12 +23,18 @@ class DisplayPage extends StatefulWidget {
 
   DisplayPage({Key? key, required url, required this.index}) : super(key: key) {
     vm.urls = url;
+    vm = DisplayVM();
   }
 
   DisplayPage.mode(
-      {Key? key, required url, required this.index, required this.mode})
+      {Key? key,
+      required url,
+      required this.index,
+      required this.mode,
+      required DetailVirtualVM virtualVM})
       : super(key: key) {
     vm.urls = url;
+    vm = DisplayVM.vm(virtualVM);
   }
 
   @override

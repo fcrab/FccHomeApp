@@ -42,13 +42,10 @@ class MineVirualVM extends DetailVirtualVM {
 
   @override
   void goBack() {
-    // TODO: implement goBack
   }
 
   @override
-  void goToNext() {
-    // TODO: implement goToNext
-  }
+  void goToNext() {}
 
   @override
   void removeAt(int index) {
@@ -62,7 +59,7 @@ class MineVirualVM extends DetailVirtualVM {
 
   @override
   String getUrl(int index) {
-    // TODO: implement getUrl
-    throw UnimplementedError();
+    var url = datas[index]['data'];
+    return url;
   }
 }

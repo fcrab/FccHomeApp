@@ -102,7 +102,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                               url: widget.vm.entries,
                               index: index,
                               mode: ImgType.LOCAL,
-                            ))).then((value) {
+                              virtualVM: widget.vm.detailVm!))).then((value) {
                   setState(() {});
                 });
               },
