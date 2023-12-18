@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
+import 'package:fcc_home/vm/display_page_vm.dart';
 import 'package:flutter/material.dart';
 
 enum ImgType { LOCAL, NETWORK }
@@ -11,12 +12,23 @@ class DisplayPage extends StatefulWidget {
 
   // Function loadNextPage;
 
-  List<String> url = [];
+  ImgType mode = ImgType.NETWORK;
+
+  DisplayVM vm = DisplayVM();
+
+  // List<String> url = [];
 
   int index = 0;
 
-  DisplayPage({Key? key, required this.url, required this.index})
-      : super(key: key);
+  DisplayPage({Key? key, required url, required this.index}) : super(key: key) {
+    vm.urls = url;
+  }
+
+  DisplayPage.mode(
+      {Key? key, required url, required this.index, required this.mode})
+      : super(key: key) {
+    vm.urls = url;
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -42,16 +54,32 @@ class DisplayPageState extends State<DisplayPage> {
   @override
   Widget build(BuildContext context) {
     var children = <Widget>[];
-    for (int count = 0; count < widget.url.length; count++) {
+    for (int count = 0; count < widget.vm.urls.length; count++) {
       children
-          .add(PageImgWidget(type: ImgType.NETWORK, url: widget.url[count]));
+          .add(PageImgWidget(type: widget.mode, url: widget.vm.urls[count]));
+    }
+
+    var barActions = [
+      IconButton(
+          onPressed: () {
+            setState(() {
+              widget.vm.deletePic(widget.index);
+            });
+          },
+          icon: const Icon(Icons.delete_outline))
+    ];
+    if (widget.mode == ImgType.NETWORK) {
+      barActions = [];
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("display")),
+      appBar: AppBar(
+        title: const Text("display"),
+        actions: barActions,
+      ),
       body: PageView(
-        children: children,
         controller: controller,
+        children: children,
       ),
       // body:
       //   GestureDetector(
