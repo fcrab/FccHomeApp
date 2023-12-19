@@ -3,6 +3,7 @@ package com.crabfibber.fcc_home
 import android.Manifest
 import android.app.Activity
 import android.content.ContentUris
+import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
@@ -14,6 +15,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+
+    private val TAG = "HomeApp"
 
     private val CHANNEL = "com.crabfibber.fcc_home/event"
 
@@ -40,11 +43,26 @@ class MainActivity : FlutterActivity() {
                         result.success(list)
                     }
                 }
+                "delete" -> {
+                    val uri = call.arguments
+                    Log.d(TAG,"delete uri :$uri")
+                    if(deleteImg(uri.toString())){
+                        result.success(true)
+                    }else{
+                        result.error("-100","","")
+                    }
+                }
             }
 
         }
     }
 
+
+    private fun deleteImg(uriPath:String):Boolean{
+        val imgUri = Uri.parse(uriPath)
+        val deleted = contentResolver.delete(imgUri,null,null)
+        return deleted>0
+    }
 
     fun requestPhonePermission(activity: Activity, callback: (isGranted: Boolean) -> Unit) {
 
