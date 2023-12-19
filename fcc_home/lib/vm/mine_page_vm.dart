@@ -48,7 +48,9 @@ class MineVirualVM extends DetailVirtualVM {
   void goToNext() {}
 
   @override
-  void removeAt(int index) {
+  Future<void> removeAt(int index) async {
+    dynamic result =
+        await HomeGlobal.platform.invokeMethod("delete", datas[index]['id']);
     datas.removeAt(index);
   }
 

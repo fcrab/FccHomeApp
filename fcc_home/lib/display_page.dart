@@ -33,8 +33,8 @@ class DisplayPage extends StatefulWidget {
       required this.mode,
       required DetailVirtualVM virtualVM})
       : super(key: key) {
-    vm.urls = url;
     vm = DisplayVM.vm(virtualVM);
+    vm.urls = url;
   }
 
   @override

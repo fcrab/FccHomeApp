@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:fcc_home/vm/mine_page_vm.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'display_page.dart';
-import 'home_global.dart';
 
 class MinePageWidget extends StatefulWidget {
   MinePageWidget({Key? key}) : super(key: key);
@@ -30,7 +28,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
     print("demo page init state");
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        widget.vm.refreshDatas();
+        await widget.vm.refreshDatas();
 
         setState(() {});
 
@@ -108,34 +106,34 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
               },
             )
 
-          // child: Image.file(File(entries[index]),
-          //     fit: BoxFit.cover,
-          //     height: 150,
-          //     filterQuality: FilterQuality.low)
+            // child: Image.file(File(entries[index]),
+            //     fit: BoxFit.cover,
+            //     height: 150,
+            //     filterQuality: FilterQuality.low)
 
-        );
+            );
       }),
     );
 
-    return GridView.builder(
-        padding: const EdgeInsets.all(4),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            childAspectRatio: 4 / 3,
-            crossAxisSpacing: 4,
-            mainAxisSpacing: 2),
-        itemCount: entries.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            // child: Center(child: Image.network(entries[index])),
-              padding: const EdgeInsets.only(top: 4),
-              // child: Center(
-              child: Image.file(File(entries[index]),
-                  fit: BoxFit.cover,
-                  height: 150,
-                  filterQuality: FilterQuality.low)
-            // ),
-          );
-        });
+    // return GridView.builder(
+    //     padding: const EdgeInsets.all(4),
+    //     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+    //         maxCrossAxisExtent: 200,
+    //         childAspectRatio: 4 / 3,
+    //         crossAxisSpacing: 4,
+    //         mainAxisSpacing: 2),
+    //     itemCount: entries.length,
+    //     itemBuilder: (BuildContext context, int index) {
+    //       return Container(
+    //         // child: Center(child: Image.network(entries[index])),
+    //           padding: const EdgeInsets.only(top: 4),
+    //           // child: Center(
+    //           child: Image.file(File(entries[index]),
+    //               fit: BoxFit.cover,
+    //               height: 150,
+    //               filterQuality: FilterQuality.low)
+    //         // ),
+    //       );
+    //     });
   }
 }

@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.io.File
 
 class MainActivity : FlutterActivity() {
 
@@ -48,8 +49,8 @@ class MainActivity : FlutterActivity() {
                     Log.d(TAG,"delete uri :$uri")
                     if(deleteImg(uri.toString())){
                         result.success(true)
-                    }else{
-                        result.error("-100","","")
+                    } else {
+                        result.error("-100", "", "")
                     }
                 }
             }
@@ -58,10 +59,12 @@ class MainActivity : FlutterActivity() {
     }
 
 
-    private fun deleteImg(uriPath:String):Boolean{
-        val imgUri = Uri.parse(uriPath)
-        val deleted = contentResolver.delete(imgUri,null,null)
-        return deleted>0
+    private fun deleteImg(id: String): Boolean {
+        val imgUri =
+            ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toLong())
+//        val imgUri = Uri.parse(uriPath)
+        val deleted = contentResolver.delete(imgUri, null, null)
+        return deleted > 0
     }
 
     fun requestPhonePermission(activity: Activity, callback: (isGranted: Boolean) -> Unit) {

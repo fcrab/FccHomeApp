@@ -10,6 +10,7 @@ class DisplayVM {
   List<String> urls = [];
 
   void deletePic(int index) {
+    virtualVM?.removeAt(index);
     urls.removeAt(index);
   }
 
