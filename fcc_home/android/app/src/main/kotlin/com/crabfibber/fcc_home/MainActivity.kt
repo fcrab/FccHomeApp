@@ -21,6 +21,8 @@ class MainActivity : FlutterActivity() {
 
     private val CHANNEL = "com.crabfibber.fcc_home/event"
 
+    private val album = LocalAlbum()
+
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
 
@@ -40,7 +42,8 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 "getAllPics" -> {
-                    getPics { list ->
+                    album.getPics(this) { list ->
+//                    album.getThumbs(this) { list ->
                         result.success(list)
                     }
                 }
@@ -67,7 +70,7 @@ class MainActivity : FlutterActivity() {
         return deleted > 0
     }
 
-    fun requestPhonePermission(activity: Activity, callback: (isGranted: Boolean) -> Unit) {
+    private fun requestPhonePermission(activity: Activity, callback: (isGranted: Boolean) -> Unit) {
 
 //            Permissions(activity).request(Manifest.permission.READ_PHONE_STATE) { permission, granted, shouldShowRequestPermissionRationale ->
         val requestCode = PermissionRequestUtil.getRequestCode()
@@ -103,64 +106,5 @@ class MainActivity : FlutterActivity() {
         )
     }
 
-    private val STORE_IMAGES = arrayOf(
-        MediaStore.Images.Media.DISPLAY_NAME,  // 显示的名字
-//        MediaStore.Images.Media.DATA, MediaStore.Images.Media.LONGITUDE,  // 经度
-        MediaStore.Images.Media.DATE_ADDED,
-        MediaStore.Images.Media.SIZE,
-        MediaStore.Images.Media._ID,  // id
-        MediaStore.Images.Media.BUCKET_ID,  // dir id 目录
-        MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
-        MediaStore.Images.Media.DATA
-    )
 
-    val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
-
-    val localPicsList = mutableListOf<String>()
-
-    fun getPics(callback: (list: List<String>) -> Unit) {
-        val gson = Gson()
-        val query = applicationContext.contentResolver.query(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            STORE_IMAGES,
-            null,
-            null,
-            sortOrder
-        )
-
-        query?.use {
-            val idColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val nameColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            val dateColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
-            val sizeColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
-            val bucketColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
-            val bucketNameColumn =
-                it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
-            val dataColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-
-            while (it.moveToNext()) {
-                val valueMap = mutableMapOf<String, String>()
-                val id = it.getLong(idColumn)
-                val name = it.getString(nameColumn)
-                val date = it.getString(dateColumn)
-                val size = it.getString(sizeColumn) ?: ""
-                val bucketId = it.getLong(bucketColumn)
-                val bucketName = it.getString(bucketNameColumn)
-                val uri =
-                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                valueMap["id"] = id.toString()
-                valueMap["name"] = name
-                valueMap["date"] = date
-                valueMap["size"] = size ?: "0"
-                valueMap["bucketId"] = bucketId.toString()
-                valueMap["bucketName"] = bucketName
-                valueMap["uri"] = uri.path ?: ""
-                valueMap["data"] = it.getString(dataColumn)
-                val infos = gson.toJson(valueMap)
-//                Log.d("MainAct", infos)
-                localPicsList += infos
-            }
-            callback(localPicsList)
-        }
-    }
 }
