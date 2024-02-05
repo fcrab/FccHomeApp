@@ -33,6 +33,12 @@ class MinePageVM {
     // _initApp();
     // _listenToEvent();
   }
+
+
+  Future<void> syncFiles() async{
+    
+  }
+
 }
 
 class MineVirualVM extends DetailVirtualVM {

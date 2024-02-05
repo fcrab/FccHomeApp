@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 
 class NetClient {
-  Dio dio = new Dio();
+  Dio dio = Dio();
 
   NetClient() : super() {
     dio.options.connectTimeout = const Duration(seconds: 20);
@@ -28,6 +28,7 @@ class NetClient {
   // String baseUrl = "http://172.16.0.18:8080/";
   String baseUrl = "http://192.168.31.205:8080/";
 
+  // 注册
   Future<String?> register(String name, String psw) async {
     String authUrl = "auth/create";
     try {
@@ -52,6 +53,7 @@ class NetClient {
     return null;
   }
 
+  //登录
   Future<String?> postLogin(String user, String psw) async {
     String authUrl = "auth/login";
     try {
@@ -66,6 +68,7 @@ class NetClient {
     return null;
   }
 
+  //刷新token
   Future<String?> refreshToken(String refreshToken) async {
     String tokenUrl = "token/refresh";
     try {
@@ -79,6 +82,7 @@ class NetClient {
     return null;
   }
 
+  //获取云端照片
   Future<String?> getServerPicsList(String token, int dir, int? page) async {
     String picListUrl = "files/listByPage";
     try {
@@ -92,6 +96,7 @@ class NetClient {
     return null;
   }
 
+  //获取云端目录
   Future<String?> getServerDirList(String token, int parent) async {
     String dirListUrl = "folder/expand";
     try {
@@ -105,6 +110,38 @@ class NetClient {
     return null;
   }
 
+  Future<String?> checkFilesExist(List<String> md5s,String token) async{
+    String checkUrl = "files/checkFiles";
+    try{
+      var map = {'user':token,'files':md5s};
+      var response = await dio.post(baseUrl+checkUrl,data:map);
+      return parseResult(response);
+    }catch(exp){
+      print(exp);
+    }
+    return null;
+  }
+
+  //上传图片
+  Future<String?> uploadLocalFile(String name,String path,String token,String md5) async{
+    String uploadUrl = "files/upload";
+    try{
+      FormData data = FormData.fromMap({
+        "img":
+        await MultipartFile.fromFile(path,filename: name),
+        "name":name,
+        "user_id":token,
+        "md5":md5
+      });
+      var response = await dio.post(baseUrl+uploadUrl,data:data);
+      return parseResult(response);
+    }catch(exp){
+      print(exp);
+    }
+    return null;
+  }
+
+  //基础解析
   String? parseResult(Response response) {
     if (response.statusCode == 200) {
       print(response.data);
