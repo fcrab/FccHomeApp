@@ -29,7 +29,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (defaultTargetPlatform == TargetPlatform.android) {
         await widget.vm.refreshDatas();
-
+        isChecked = List.filled(widget.vm.entries.length, false);
         setState(() {});
 
 /*
@@ -77,8 +77,12 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
     return images;
   }
 
+  // bool isChecked = false;
+  List<bool?> isChecked = [];
+
   @override
   Widget build(BuildContext context) {
+    print("rebuild list");
     return GridView.count(
       crossAxisCount: 2,
       children: List.generate(widget.vm.entries.length, (index) {
@@ -86,32 +90,53 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
             // child: Center(child: Image.network(entries[index])),
             padding: const EdgeInsets.all(4),
             child: GestureDetector(
-              child: Image(
-                image: FileImage(File(widget.vm.entries[index]), scale: 0.1),
-                height: 150,
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.low,
+              child: Stack(
+                alignment: Alignment.center, //对为定位或部分定位的widget生效
+                fit: StackFit.expand,
+                children: [
+                  Image(
+                    image:
+                        FileImage(File(widget.vm.entries[index]), scale: 0.1),
+                    height: 150,
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.low,
+                  ),
+                  Positioned(
+                    right: 10,
+                    bottom: 10,
+                    child: Checkbox(
+                      checkColor: Colors.white,
+                      value: isChecked[index],
+                      onChanged: (bool? value) {
+                        setState(() {
+                          print("item $index change to value: $value");
+                          isChecked[index] = value;
+                        });
+                      },
+                    ),
+                  )
+                ],
               ),
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => DisplayPage.mode(
-                              url: widget.vm.entries,
-                              index: index,
-                              mode: ImgType.LOCAL,
-                              virtualVM: widget.vm.detailVm!))).then((value) {
+                            url: widget.vm.entries,
+                            index: index,
+                            mode: ImgType.LOCAL,
+                            virtualVM: widget.vm.detailVm!))).then((value) {
                   setState(() {});
                 });
               },
             )
 
-            // child: Image.file(File(entries[index]),
-            //     fit: BoxFit.cover,
-            //     height: 150,
-            //     filterQuality: FilterQuality.low)
+          // child: Image.file(File(entries[index]),
+          //     fit: BoxFit.cover,
+          //     height: 150,
+          //     filterQuality: FilterQuality.low)
 
-            );
+        );
       }),
     );
 

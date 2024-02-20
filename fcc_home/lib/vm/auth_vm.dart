@@ -22,11 +22,12 @@ class AuthVM {
     loginInfo.refreshData(LoginInfo.test());
   }
 
+  // todo test
   Future<void> verifyLocal() async {
     await HomeGlobal.getLocalToken();
-    if (HomeGlobal.token != "") {
-      loginInfo.refreshData(LoginInfo.test());
-    }
+    // if (HomeGlobal.token != "") {
+    loginInfo.refreshData(LoginInfo.test());
+    // }
   }
 
   Future<void> sendLogin(userName, password) async {

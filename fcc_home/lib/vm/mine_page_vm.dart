@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:fcc_home/entity/file_info.dart';
 import 'package:fcc_home/home_global.dart';
 import 'package:fcc_home/vm/detail_virtual_vm.dart';
 
 class MinePageVM {
   List<String> entries = [];
+
+  List<SyncInfo> syncEntries = [];
 
   MineVirualVM? detailVm;
 
@@ -70,4 +73,12 @@ class MineVirualVM extends DetailVirtualVM {
     var url = datas[index]['data'];
     return url;
   }
+}
+
+class SyncInfo {
+  String uri;
+  FileInfo? info;
+  bool syncState = false;
+
+  SyncInfo({required this.uri});
 }

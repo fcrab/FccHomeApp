@@ -20,11 +20,28 @@ class _HomePageWidgetState extends State<HomePageWidget>
   static const platform = MethodChannel("com.crabfibber.fcc_home/event");
   final TargetPlatform defaultTargetPlatform;
 
+  FloatingActionButton? syncBtn;
+
   void _incrementCounter() {
     setState(() {});
   }
 
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    syncBtn = genSyncBtn();
+  }
+
+  FloatingActionButton genSyncBtn() {
+    return FloatingActionButton(
+      onPressed: () {
+        _incrementCounter();
+      },
+      tooltip: 'syncfiles',
+      child: const Icon(Icons.sync),
+    );
+  }
 
   static final List<Widget> _pageWidget = <Widget>[
     MinePageWidget(),
@@ -34,6 +51,12 @@ class _HomePageWidgetState extends State<HomePageWidget>
   void _onTapItem(int index) {
     setState(() {
       _selectedIndex = index;
+      //todo 可以在这里控制切换
+      if (_selectedIndex == 0) {
+        syncBtn = genSyncBtn();
+      } else {
+        syncBtn = null;
+      }
     });
   }
 
@@ -44,6 +67,20 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        // actions: [
+        // CustomAction(
+        //   TextButton(
+        //     onPressed: (){},
+        //     child: const Column(
+        //       children: [
+        //         Icon(Icons.sync,color: Colors.black54,),
+        //         Text("同步",
+        //         style: TextStyle(color:Colors.black54,fontSize: 10),)
+        //       ],
+        //     ),
+        //   ),true
+        // ),
+        // ],
       ),
       drawer: const Drawer(
         child: Text("test"),
@@ -55,11 +92,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
           children: _pageWidget,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: syncBtn,
       // This trailing comma makes auto-formatting nicer for build methods.
       bottomNavigationBar: BottomNavigationBar(
         items: const [
