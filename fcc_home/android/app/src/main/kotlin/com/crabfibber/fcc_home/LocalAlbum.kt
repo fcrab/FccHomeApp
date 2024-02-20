@@ -2,6 +2,7 @@ package com.crabfibber.fcc_home
 
 import android.content.ContentUris
 import android.content.Context
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Thumbnails
 import android.service.controls.templates.ThumbnailTemplate
@@ -27,6 +28,9 @@ class LocalAlbum {
 
 
     fun getPics(context: Context, callback: (list: List<String>) -> Unit) {
+        val originPath = Environment.getExternalStorageDirectory()
+        val systemPath = Environment.DIRECTORY_DCIM
+
         val gson = Gson()
         val query = context.applicationContext.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -66,7 +70,11 @@ class LocalAlbum {
                 valueMap["data"] = it.getString(dataColumn)
                 val infos = gson.toJson(valueMap)
 //                Log.d("MainAct", infos)
-                localPicsList += infos
+                val fullPath = "${originPath}/${systemPath}"
+                if (valueMap["data"]!!.contains(fullPath)) {
+                    Log.d("localAlbum", "data ${valueMap["data"]} syspath:${fullPath}")
+                    localPicsList += infos
+                }
             }
             callback(localPicsList)
         }
