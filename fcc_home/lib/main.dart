@@ -16,20 +16,25 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = ColorScheme.fromSeed(
+        brightness: MediaQuery.platformBrightnessOf(context),
+        seedColor: Colors.amber);
+
     return MaterialApp(
       title: 'Flutter Demo',
+      //material3的做法
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.amber,
+        useMaterial3: true,
+        colorScheme: colorScheme,
+        // primarySwatch: Colors.amber,
       ),
+
+      //维持material2的做法
+      // theme: ThemeData(
+      //   useMaterial3: false,
+      //   // colorScheme: colorScheme,
+      //   primarySwatch: Colors.amber,
+      // ),
       routes: {
         "home": (context) =>
             HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
