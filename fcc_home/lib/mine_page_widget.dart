@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:fcc_home/CustomAction.dart';
 import 'package:fcc_home/vm/mine_page_vm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import 'display_page.dart';
 
@@ -30,8 +30,8 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (defaultTargetPlatform == TargetPlatform.android) {
         await widget.vm.refreshDatas();
-        isChecked = List.filled(widget.vm.entries.length, false);
-        setState(() {});
+        // isChecked = List.filled(widget.vm.entries.length, false);
+        // setState(() {});
 
 /*
         dynamic result =
@@ -79,68 +79,74 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
   }
 
   // bool isChecked = false;
-  List<bool?> isChecked = [];
+  // List<bool> isChecked = [];
 
   @override
   Widget build(BuildContext context) {
     print("rebuild list");
-    return GridView.count(
-      crossAxisCount: 2,
-      children: List.generate(widget.vm.entries.length, (index) {
-        return Container(
-            // child: Center(child: Image.network(entries[index])),
-            padding: const EdgeInsets.all(4),
-            child: GestureDetector(
-              child: Stack(
-                alignment: Alignment.center, //对为定位或部分定位的widget生效
-                fit: StackFit.expand,
-                children: [
-                  Image(
-                    image:
-                        FileImage(File(widget.vm.entries[index]), scale: 0.1),
-                    height: 150,
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.low,
+    return ChangeNotifierProvider(
+      create: (ctx) => widget.vm.mineEntries,
+      child: Consumer<MineFiles>(
+        builder: (ctx, info, child) => GridView.count(
+          crossAxisCount: 2,
+          children: List.generate(info.syncEntries.length, (index) {
+            return Container(
+                // child: Center(child: Image.network(entries[index])),
+                padding: const EdgeInsets.all(4),
+                child: GestureDetector(
+                  child: Stack(
+                    alignment: Alignment.center, //对为定位或部分定位的widget生效
+                    fit: StackFit.expand,
+                    children: [
+                      Image(
+                        image: FileImage(File(info.syncEntries[index].uri),
+                            scale: 0.1),
+                        height: 150,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.low,
+                      ),
+                      Positioned(
+                        right: 10,
+                        bottom: 10,
+                        child: Visibility(
+                            visible: !info.syncEntries[index].syncState,
+                            child: Checkbox(
+                              checkColor: Colors.white,
+                              value: info.syncList[index],
+                              onChanged: (bool? value) {
+                                // setState(() {
+                                print("item $index change to value: $value");
+                                info.syncList[index] = value!;
+                                info.notifyListeners();
+                                // });
+                              },
+                            )),
+                      )
+                    ],
                   ),
-                  Positioned(
-                    right: 10,
-                    bottom: 10,
-                    child: CustomAction(
-                        Checkbox(
-                          checkColor: Colors.white,
-                          value: isChecked[index],
-                          onChanged: (bool? value) {
-                            setState(() {
-                              print("item $index change to value: $value");
-                              isChecked[index] = value;
-                            });
-                          },
-                        ),
-                        !widget.vm.mineEntries.syncEntries[index].syncState),
-                  )
-                ],
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DisplayPage.mode(
-                            url: widget.vm.entries,
-                            index: index,
-                            mode: ImgType.LOCAL,
-                            virtualVM: widget.vm.detailVm!))).then((value) {
-                  setState(() {});
-                });
-              },
-            )
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DisplayPage.mode(
+                                url: widget.vm.entries,
+                                index: index,
+                                mode: ImgType.LOCAL,
+                                virtualVM: widget.vm.detailVm!))).then((value) {
+                      setState(() {});
+                    });
+                  },
+                )
 
-          // child: Image.file(File(entries[index]),
-          //     fit: BoxFit.cover,
-          //     height: 150,
-          //     filterQuality: FilterQuality.low)
+                // child: Image.file(File(entries[index]),
+                //     fit: BoxFit.cover,
+                //     height: 150,
+                //     filterQuality: FilterQuality.low)
 
-        );
-      }),
+                );
+          }),
+        ),
+      ),
     );
 
     // return GridView.builder(

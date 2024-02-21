@@ -72,9 +72,12 @@ class MinePageVM {
 class MineFiles with ChangeNotifier {
   List<SyncInfo> syncEntries = [];
 
+  List<bool> syncList = [];
+
   void refreshFiles(List<SyncInfo> newFiles) {
     syncEntries.clear();
     syncEntries.addAll(newFiles);
+    syncList = List.filled(syncEntries.length, false);
     notifyListeners();
   }
 
