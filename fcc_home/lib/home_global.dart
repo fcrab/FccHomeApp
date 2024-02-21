@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,23 +12,37 @@ class HomeGlobal {
 
   static const platform = MethodChannel("com.crabfibber.fcc_home/event");
 
+  static saveAccessInfo(String value) async {
+    saveInfo("user", value);
+    Map<String, dynamic> jsonObj = json.decode(value);
+    loginInfo = LoginInfo.fromJson(jsonObj);
+  }
+
   static saveAccessToken(String value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("token", value);
+    saveInfo("token", value);
     getLocalToken();
   }
 
   static saveRefreshToken(String value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("refresh", value);
+    saveInfo("refresh", value);
   }
 
   static getLocalToken() async {
-    String? result = "";
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    result = prefs.getString("token");
+    String? result = await getLocalInfo("token");
     if (result != null) {
       token = result;
     }
+  }
+
+  static saveInfo(String key, String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
+  }
+
+  static Future<String?> getLocalInfo(String key) async {
+    String? result = "";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    result = prefs.getString(key);
+    return result;
   }
 }

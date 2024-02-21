@@ -36,6 +36,7 @@ class AuthVM {
       if (loginStr != null) {
         Map<String, dynamic> jsonObj = json.decode(loginStr);
         var info = LoginInfo.fromJson(jsonObj);
+        HomeGlobal.saveAccessInfo(loginStr);
         HomeGlobal.saveAccessToken(info.id);
         loginInfo.refreshData(info);
       }

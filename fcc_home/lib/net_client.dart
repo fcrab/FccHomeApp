@@ -110,6 +110,7 @@ class NetClient {
     return null;
   }
 
+  //检查文件同步状态
   Future<String?> checkFilesExist(List<String> md5s,String token) async{
     String checkUrl = "files/checkFiles";
     try{

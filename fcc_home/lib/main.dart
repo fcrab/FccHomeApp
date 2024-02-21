@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         seedColor: Colors.amber);
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Lin',
       //material3的做法
       theme: ThemeData(
         useMaterial3: true,
@@ -50,6 +50,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//demo
+/*
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
 
@@ -134,3 +136,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+*/
