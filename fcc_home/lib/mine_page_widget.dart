@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fcc_home/CustomAction.dart';
 import 'package:fcc_home/vm/mine_page_vm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -104,16 +105,18 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                   Positioned(
                     right: 10,
                     bottom: 10,
-                    child: Checkbox(
-                      checkColor: Colors.white,
-                      value: isChecked[index],
-                      onChanged: (bool? value) {
-                        setState(() {
-                          print("item $index change to value: $value");
-                          isChecked[index] = value;
-                        });
-                      },
-                    ),
+                    child: CustomAction(
+                        Checkbox(
+                          checkColor: Colors.white,
+                          value: isChecked[index],
+                          onChanged: (bool? value) {
+                            setState(() {
+                              print("item $index change to value: $value");
+                              isChecked[index] = value;
+                            });
+                          },
+                        ),
+                        !widget.vm.mineEntries.syncEntries[index].syncState),
                   )
                 ],
               ),
