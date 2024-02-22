@@ -2,12 +2,24 @@ package com.crabfibber.fcc_home
 
 import android.content.ContentUris
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Thumbnails
-import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
+import androidx.annotation.Nullable
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+
 
 class LocalAlbum {
 
@@ -28,6 +40,8 @@ class LocalAlbum {
 
 
     fun getPics(context: Context, callback: (list: List<String>) -> Unit) {
+        val thumbDir = context.getExternalFilesDir(null)!!.path + "/" + "thumb"
+        Log.d("localAlbum", "thumb dir: $thumbDir")
         val originPath = Environment.getExternalStorageDirectory()
         val systemPath = Environment.DIRECTORY_DCIM
 
@@ -63,21 +77,79 @@ class LocalAlbum {
                 valueMap["id"] = id.toString()
                 valueMap["name"] = name
                 valueMap["date"] = date
-                valueMap["size"] = size ?: "0"
+                valueMap["size"] = size
                 valueMap["bucketId"] = bucketId.toString()
                 valueMap["bucketName"] = bucketName
                 valueMap["uri"] = uri.path ?: ""
                 valueMap["data"] = it.getString(dataColumn)
-                val infos = gson.toJson(valueMap)
+
 //                Log.d("MainAct", infos)
                 val fullPath = "${originPath}/${systemPath}"
                 if (valueMap["data"]!!.contains(fullPath)) {
-                    Log.d("localAlbum", "data ${valueMap["data"]} syspath:${fullPath}")
+
+                    val relativePath = valueMap["data"]!!.split(fullPath)
+                    val thumbPath = thumbDir + relativePath[1]
+                    if (isThumbExist(thumbPath)) {
+                        Log.d("localAlbum", "thumb exist")
+                        valueMap["thumb"] = thumbPath
+                    } else {
+                        valueMap["thumb"] = ""
+                        generateThumbFile(context, valueMap["data"]!!, thumbPath)
+                    }
+//                    for(path in relativePath){
+//                        Log.d("localAlbum","split relative path :${path}")
+//                    }
+
+
+//                    Log.d("localAlbum", "data ${valueMap["data"]} syspath:${fullPath}")
+                    val infos = gson.toJson(valueMap)
                     localPicsList += infos
                 }
             }
             callback(localPicsList)
         }
+    }
+
+    private fun isThumbExist(path: String): Boolean {
+        val thumbFile = File(path)
+        return thumbFile.exists()
+    }
+
+    private fun generateThumbFile(context: Context, path: String, thumbPath: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val file = File(path)
+            val scaleFactor = 4 // 缩小的倍数
+// 使用Glide加载文件并生成按照倍数缩小后的Bitmap
+            Glide.with(context)
+                .asBitmap()
+                .load(file)
+//            .override(
+//                Target.SIZE_ORIGINAL / scaleFactor,
+//                Target.SIZE_ORIGINAL / scaleFactor
+//            ) // 按照倍数缩小Bitmap的尺寸
+                .into(object : SimpleTarget<Bitmap>(
+                    Target.SIZE_ORIGINAL / scaleFactor,
+                    Target.SIZE_ORIGINAL / scaleFactor
+                ) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        @Nullable transition: Transition<in Bitmap>?
+                    ) {
+                        // 在这里处理加载成功后的按照倍数缩小后的Bitmap
+//                    imageView.setImageBitmap(resource)
+                        val thumbFile = File(thumbPath)
+                        try {
+                            val outputStream = FileOutputStream(thumbFile)
+                            Log.d("localAlbum", "generate thumb path $thumbPath")
+                            resource.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                            outputStream.close()
+                        } catch (ex: IOException) {
+                            ex.printStackTrace()
+                        }
+                    }
+                })
+        }
+
     }
 
     private val THUMB_IMAGES = arrayOf(
