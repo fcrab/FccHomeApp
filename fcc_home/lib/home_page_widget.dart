@@ -36,7 +36,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
   FloatingActionButton genSyncBtn() {
     return FloatingActionButton(
       onPressed: () {
-        _incrementCounter();
+        (_pageWidget[0] as MinePageWidget).vm.syncFiles();
+        // _incrementCounter();
       },
       tooltip: 'syncfiles',
       child: const Icon(Icons.sync),
