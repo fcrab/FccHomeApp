@@ -3,6 +3,7 @@ package com.crabfibber.fcc_home
 import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Thumbnails
@@ -119,18 +120,23 @@ class LocalAlbum {
         GlobalScope.launch(Dispatchers.IO) {
             val file = File(path)
             val scaleFactor = 4 // 缩小的倍数
+
+            val options: BitmapFactory.Options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            BitmapFactory.decodeFile(path, options)
+
+            val imageWidth: Int = options.outWidth
+            val imageHeight: Int = options.outHeight
+
 // 使用Glide加载文件并生成按照倍数缩小后的Bitmap
             Glide.with(context)
                 .asBitmap()
                 .load(file)
-//            .override(
-//                Target.SIZE_ORIGINAL / scaleFactor,
-//                Target.SIZE_ORIGINAL / scaleFactor
-//            ) // 按照倍数缩小Bitmap的尺寸
-                .into(object : SimpleTarget<Bitmap>(
-                    Target.SIZE_ORIGINAL / scaleFactor,
-                    Target.SIZE_ORIGINAL / scaleFactor
-                ) {
+                .override(
+                    imageWidth / scaleFactor,
+                    imageHeight / scaleFactor
+                ) // 按照倍数缩小Bitmap的尺寸
+                .into(object : SimpleTarget<Bitmap>() {
                     override fun onResourceReady(
                         resource: Bitmap,
                         @Nullable transition: Transition<in Bitmap>?
@@ -139,9 +145,17 @@ class LocalAlbum {
 //                    imageView.setImageBitmap(resource)
                         val thumbFile = File(thumbPath)
                         try {
+                            val parentDir = thumbFile.parentFile
+                            if (parentDir != null && !parentDir.exists()) {
+                                parentDir.mkdirs()
+                            }
+                        } catch (ex: IOException) {
+                            ex.printStackTrace()
+                        }
+                        try {
                             val outputStream = FileOutputStream(thumbFile)
                             Log.d("localAlbum", "generate thumb path $thumbPath")
-                            resource.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                            resource.compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
                             outputStream.close()
                         } catch (ex: IOException) {
                             ex.printStackTrace()

@@ -60,6 +60,7 @@ class MinePageVM {
     }
     String? result = await client.checkFilesExist(md5s, HomeGlobal.token);
     if (result != null) {
+      print(result);
       List<String> unSyncMd5s = json.decode(result);
       mineEntries.refreshSyncState(unSyncMd5s);
     }
