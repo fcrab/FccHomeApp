@@ -6,8 +6,9 @@ import 'package:crypto/crypto.dart';
 Future<String> getFileHash(String path) async {
   final file = File(path);
   // final fileLength = file.lengthSync();
-
+  print("try make file md5");
   final bytes = file.readAsBytesSync().buffer.asUint8List();
   final hash = md5.convert(bytes.buffer.asUint8List()).toString();
+  print("md5 generated $hash");
   return hash;
 }

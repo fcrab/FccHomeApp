@@ -114,8 +114,9 @@ class NetClient {
   Future<String?> checkFilesExist(List<String> md5s,String token) async{
     String checkUrl = "files/checkFiles";
     try{
-      var map = {'user':token,'files':md5s};
-      var response = await dio.post(baseUrl+checkUrl,data:map);
+      var map = {'user': token, 'files': md5s};
+      print("checkFiles data\n$map");
+      var response = await dio.post(baseUrl + checkUrl, data: map);
       return parseResult(response);
     }catch(exp){
       print(exp);

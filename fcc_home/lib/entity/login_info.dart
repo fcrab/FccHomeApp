@@ -35,7 +35,7 @@ class LoginInfo with ChangeNotifier {
   });
 
   LoginInfo.test({
-    this.id = '11223',
+    this.id = '6',
     this.email = '',
     this.salt = '',
     this.phoneNumber = '',

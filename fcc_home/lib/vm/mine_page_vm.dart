@@ -53,17 +53,18 @@ class MinePageVM {
   /// 检查文件同步状态
   Future<void> checkFileSync() async {
     List<String> md5s = [];
+    print("file numbers ${mineEntries.syncEntries.length}");
     for (var entity in mineEntries.syncEntries) {
       var md5 = await getFileHash(entity.uri);
-      entity.info!.md5 = md5;
+      entity.md5 = md5;
       md5s.add(md5);
     }
-    String? result = await client.checkFilesExist(md5s, HomeGlobal.token);
-    if (result != null) {
-      print(result);
-      List<String> unSyncMd5s = json.decode(result);
-      mineEntries.refreshSyncState(unSyncMd5s);
-    }
+    // String? result = await client.checkFilesExist(md5s, HomeGlobal.token);
+    // if (result != null) {
+    //   print(result);
+    //   List<String> unSyncMd5s = json.decode(result);
+    //   mineEntries.refreshSyncState(unSyncMd5s);
+    // }
   }
 
   //同步文件
@@ -84,7 +85,7 @@ class MineFiles with ChangeNotifier {
 
   void refreshSyncState(List<String> unSyncMd5s) {
     for (var info in syncEntries) {
-      if (unSyncMd5s.contains(info.info!.md5)) {
+      if (unSyncMd5s.contains(info.md5)) {
         info.syncState = false;
       }
     }
@@ -124,6 +125,7 @@ class MineVirualVM extends DetailVirtualVM {
 
 class SyncInfo {
   String uri;
+  String? md5;
   FileInfo? info;
   bool syncState = false;
 

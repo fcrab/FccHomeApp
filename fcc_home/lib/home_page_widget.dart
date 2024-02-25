@@ -35,8 +35,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   FloatingActionButton genSyncBtn() {
     return FloatingActionButton(
-      onPressed: () {
+      onPressed: () async {
         (_pageWidget[0] as MinePageWidget).vm.checkFileSync();
+        print("first run here");
         // _incrementCounter();
       },
       tooltip: 'syncfiles',
