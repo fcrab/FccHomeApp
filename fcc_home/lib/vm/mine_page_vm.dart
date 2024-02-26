@@ -9,6 +9,28 @@ import 'package:flutter/material.dart';
 
 import '../util/fileCrypto.dart';
 
+void wtd(SendPort port) {
+  Isolate.exit(port, "welldone");
+}
+
+Future<void> checkFileSyncTop(List<dynamic> args) async {
+  List<String> md5s = [];
+  List<SyncInfo> entries = args[1];
+  print("file numbers ${entries.length}");
+  for (var entity in entries) {
+    var md5 = await getFileHash(entity.uri);
+    entity.md5 = md5;
+    md5s.add(md5);
+  }
+  // String? result = await client.checkFilesExist(md5s, HomeGlobal.token);
+  // if (result != null) {
+  //   print(result);
+  //   List<String> unSyncMd5s = json.decode(result);
+  //   mineEntries.refreshSyncState(unSyncMd5s);
+  // }
+  Isolate.exit(args[0], "welldone");
+}
+
 class MinePageVM {
   MineFiles mineEntries = MineFiles();
 
@@ -51,10 +73,17 @@ class MinePageVM {
     // _listenToEvent();
   }
 
-  Future<void> checkFilesByIsolate() async {
+  void checkFilesByIsolate() async {
+    // 1
     final resultPort = ReceivePort();
-    await Isolate.spawn(checkFileSync, [resultPort.sendPort]);
-    // String result =
+    // 2
+    SendPort port = resultPort.sendPort;
+    // 3
+    var isolate =
+        await Isolate.spawn(checkFileSyncTop, [port, mineEntries.syncEntries]);
+    // 4
+    String result = await resultPort.first as String;
+    print("check files result: $result");
   }
 
   /// 检查文件同步状态

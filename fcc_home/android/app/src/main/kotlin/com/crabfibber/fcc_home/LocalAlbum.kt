@@ -91,7 +91,7 @@ class LocalAlbum {
                     val relativePath = valueMap["data"]!!.split(fullPath)
                     val thumbPath = thumbDir + relativePath[1]
                     if (isThumbExist(thumbPath)) {
-                        Log.d("localAlbum", "thumb exist")
+//                        Log.d("localAlbum", "thumb exist")
                         valueMap["thumb"] = thumbPath
                     } else {
                         valueMap["thumb"] = ""
