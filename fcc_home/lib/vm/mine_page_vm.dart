@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:fcc_home/entity/file_info.dart';
 import 'package:fcc_home/home_global.dart';
@@ -50,8 +51,14 @@ class MinePageVM {
     // _listenToEvent();
   }
 
+  Future<void> checkFilesByIsolate() async {
+    final resultPort = ReceivePort();
+    await Isolate.spawn(checkFileSync, [resultPort.sendPort]);
+    // String result =
+  }
+
   /// 检查文件同步状态
-  Future<void> checkFileSync() async {
+  Future<void> checkFileSync(List<dynamic> args) async {
     List<String> md5s = [];
     print("file numbers ${mineEntries.syncEntries.length}");
     for (var entity in mineEntries.syncEntries) {
@@ -65,6 +72,7 @@ class MinePageVM {
     //   List<String> unSyncMd5s = json.decode(result);
     //   mineEntries.refreshSyncState(unSyncMd5s);
     // }
+    Isolate.exit(args[0], "welldone");
   }
 
   //同步文件

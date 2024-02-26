@@ -36,7 +36,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
   FloatingActionButton genSyncBtn() {
     return FloatingActionButton(
       onPressed: () async {
-        (_pageWidget[0] as MinePageWidget).vm.checkFileSync();
+        (_pageWidget[0] as MinePageWidget).vm.checkFileSync([]);
         print("first run here");
         // _incrementCounter();
       },
