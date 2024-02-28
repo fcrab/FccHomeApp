@@ -2,6 +2,7 @@ class FileInfo {
   int id;
   String name;
   String url;
+  String thumb;
   String md5;
   DateTime createTime;
   DateTime lastModify;
@@ -10,6 +11,7 @@ class FileInfo {
       {required this.id,
       required this.name,
       required this.url,
+      required this.thumb,
       required this.md5,
       required this.createTime,
       required this.lastModify});
@@ -19,6 +21,7 @@ class FileInfo {
         id: dataMap['id'] as int,
         name: dataMap['name'],
         url: dataMap['url'],
+        thumb: dataMap['thumb'],
         md5: dataMap['md5'],
         createTime: DateTime.now(),
         lastModify: DateTime.now());
@@ -27,6 +30,6 @@ class FileInfo {
     // lastModify: DateTime.parse(dataMap['lastModify']));
   }
 
-  FileInfo.name(
-      this.id, this.name, this.url, this.md5, this.createTime, this.lastModify);
+  FileInfo.name(this.id, this.name, this.url, this.thumb, this.md5,
+      this.createTime, this.lastModify);
 }
