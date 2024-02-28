@@ -61,7 +61,14 @@ class MinePageVM {
         picsPath.add(picsMap['data']);
         datas.add(picsMap);
 
-        var info = SyncInfo(uri: picsMap['data']);
+        SyncInfo info;
+
+        if (picsMap['thumb'] != null &&
+            picsMap['thumb'].toString().isNotEmpty) {
+          info = SyncInfo(uri: picsMap['data'], thumb: picsMap['thumb']);
+        } else {
+          info = SyncInfo(uri: picsMap['data'], thumb: picsMap['data']);
+        }
         syncFiles.add(info);
       }
       entries = picsPath;
@@ -162,9 +169,10 @@ class MineVirualVM extends DetailVirtualVM {
 
 class SyncInfo {
   String uri;
+  String thumb;
   String? md5;
   FileInfo? info;
   bool syncState = false;
 
-  SyncInfo({required this.uri});
+  SyncInfo({required this.uri, required this.thumb});
 }

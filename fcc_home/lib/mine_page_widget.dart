@@ -100,7 +100,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                     fit: StackFit.expand,
                     children: [
                       Image(
-                        image: FileImage(File(info.syncEntries[index].uri),
+                        image: FileImage(File(info.syncEntries[index].thumb),
                             scale: 0.1),
                         height: 150,
                         fit: BoxFit.cover,
