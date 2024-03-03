@@ -14,21 +14,30 @@ void wtd(SendPort port) {
 }
 
 Future<void> checkFileSyncTop(List<dynamic> args) async {
+  var client = NetClient();
   List<String> md5s = [];
   List<SyncInfo> entries = args[1];
   print("file numbers ${entries.length}");
+  var tryCount = 0;
+
   for (var entity in entries) {
+    if (tryCount >= 20) {
+      break;
+    }
     var md5 = await getFileHash(entity.uri);
     entity.md5 = md5;
     md5s.add(md5);
+    tryCount += 1;
   }
-  // String? result = await client.checkFilesExist(md5s, HomeGlobal.token);
-  // if (result != null) {
-  //   print(result);
-  //   List<String> unSyncMd5s = json.decode(result);
-  //   mineEntries.refreshSyncState(unSyncMd5s);
-  // }
-  Isolate.exit(args[0], "welldone");
+  String? result = await client.checkFilesExist(md5s, "6");
+  if (result != null) {
+    print("checkFileResult: $result");
+    List<String> unSyncMd5s = json.decode(result);
+    // mineEntries.refreshSyncState(unSyncMd5s);
+    Isolate.exit(args[0], unSyncMd5s);
+  } else {
+    Isolate.exit(args[0], []);
+  }
 }
 
 class MinePageVM {
@@ -65,9 +74,15 @@ class MinePageVM {
 
         if (picsMap['thumb'] != null &&
             picsMap['thumb'].toString().isNotEmpty) {
-          info = SyncInfo(uri: picsMap['data'], thumb: picsMap['thumb']);
+          info = SyncInfo(
+              name: picsMap['name'],
+              uri: picsMap['data'],
+              thumb: picsMap['thumb']);
         } else {
-          info = SyncInfo(uri: picsMap['data'], thumb: picsMap['data']);
+          info = SyncInfo(
+              name: picsMap['name'],
+              uri: picsMap['data'],
+              thumb: picsMap['data']);
         }
         syncFiles.add(info);
       }
@@ -89,8 +104,16 @@ class MinePageVM {
     var isolate =
         await Isolate.spawn(checkFileSyncTop, [port, mineEntries.syncEntries]);
     // 4
-    String result = await resultPort.first as String;
+    List<String> result = await resultPort.first;
     print("check files result: $result");
+    if (result.isNotEmpty) {
+      for (var element in mineEntries.syncEntries) {
+        if (result.contains(element.md5)) {
+          client.uploadLocalFile(element.name, element.uri, "6", element.md5!);
+        }
+      }
+      // mineEntries.refreshSyncState(result);
+    }
   }
 
   /// 检查文件同步状态
@@ -168,11 +191,12 @@ class MineVirualVM extends DetailVirtualVM {
 }
 
 class SyncInfo {
+  String name;
   String uri;
   String thumb;
   String? md5;
   FileInfo? info;
   bool syncState = false;
 
-  SyncInfo({required this.uri, required this.thumb});
+  SyncInfo({required this.name, required this.uri, required this.thumb});
 }

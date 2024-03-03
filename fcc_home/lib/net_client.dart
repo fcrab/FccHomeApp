@@ -25,8 +25,9 @@ class NetClient {
   }
 
   // String baseUrl = "http://172.16.73.222:8080/";
-  // String baseUrl = "http://172.16.0.18:8080/";
-  String baseUrl = "http://192.168.31.205:8080/";
+  String baseUrl = "http://192.168.31.193:8080/";
+
+  // String baseUrl = "http://192.168.31.205:8080/";
 
   // 注册
   Future<String?> register(String name, String psw) async {
@@ -116,7 +117,7 @@ class NetClient {
     try{
       var map = {'user': token, 'files': md5s};
       print("checkFiles data\n$map");
-      var response = await dio.post(baseUrl + checkUrl, data: map);
+      var response = await dio.post(baseUrl + checkUrl, queryParameters: map);
       return parseResult(response);
     }catch(exp){
       print(exp);
