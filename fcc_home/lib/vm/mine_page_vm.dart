@@ -19,7 +19,7 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
   List<SyncInfo> entries = args[1];
   print("file numbers ${entries.length}");
   var tryCount = 0;
-
+  var map = {};
   for (var entity in entries) {
     if (tryCount >= 20) {
       break;
@@ -27,14 +27,19 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
     var md5 = await getFileHash(entity.uri);
     entity.md5 = md5;
     md5s.add(md5);
+    map[md5] = entity.name;
     tryCount += 1;
   }
   String? result = await client.checkFilesExist(md5s, "6");
   if (result != null) {
     print("checkFileResult: $result");
-    List<String> unSyncMd5s = json.decode(result);
+    List<dynamic> unSyncMd5s = json.decode(result);
+    var resultMap = {};
+    for (var md5 in unSyncMd5s) {
+      resultMap[map[md5]] = md5;
+    }
     // mineEntries.refreshSyncState(unSyncMd5s);
-    Isolate.exit(args[0], unSyncMd5s);
+    Isolate.exit(args[0], resultMap);
   } else {
     Isolate.exit(args[0], []);
   }
@@ -104,12 +109,16 @@ class MinePageVM {
     var isolate =
         await Isolate.spawn(checkFileSyncTop, [port, mineEntries.syncEntries]);
     // 4
-    List<String> result = await resultPort.first;
+    Map result = await resultPort.first;
     print("check files result: $result");
     if (result.isNotEmpty) {
       for (var element in mineEntries.syncEntries) {
-        if (result.contains(element.md5)) {
-          client.uploadLocalFile(element.name, element.uri, "6", element.md5!);
+        if (result[element.name] != null) {
+          element.md5 = result[element.name];
+          print("uploadfile ${element.md5}");
+          var uploadResult = await client.uploadLocalFile(
+              element.name, element.uri, "6", element.md5!);
+          print("uploadresult: $uploadResult");
         }
       }
       // mineEntries.refreshSyncState(result);
