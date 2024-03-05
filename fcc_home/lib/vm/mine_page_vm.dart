@@ -30,7 +30,7 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
     map[md5] = entity.name;
     tryCount += 1;
   }
-  String? result = await client.checkFilesExist(md5s, "6");
+  String? result = await client.checkFilesExist(md5s, "10");
   if (result != null) {
     print("checkFileResult: $result");
     List<dynamic> unSyncMd5s = json.decode(result);
@@ -117,7 +117,7 @@ class MinePageVM {
           element.md5 = result[element.name];
           print("uploadfile ${element.md5}");
           var uploadResult = await client.uploadLocalFile(
-              element.name, element.uri, "6", element.md5!);
+              element.name, element.uri, "10", element.md5!);
           print("uploadresult: $uploadResult");
         }
       }

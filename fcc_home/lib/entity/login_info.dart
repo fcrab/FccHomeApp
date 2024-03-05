@@ -35,14 +35,14 @@ class LoginInfo with ChangeNotifier {
   });
 
   LoginInfo.test({
-    this.id = '6',
+    this.id = '10',
     this.email = '',
     this.salt = '',
     this.phoneNumber = '',
     this.status = 1,
     this.lastUpdateTime = '',
-    this.name = 'test1',
-    this.password = 'test11',
+    this.name = 'testc',
+    this.password = '0000',
   });
 
   void testNoti() {
