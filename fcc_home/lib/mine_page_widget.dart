@@ -29,7 +29,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
     print("demo page init state");
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        await widget.vm.refreshDatas();
+        await widget.vm.initData();
         // widget.vm.checkFileSync();
         // isChecked = List.filled(widget.vm.entries.length, false);
         // setState(() {});

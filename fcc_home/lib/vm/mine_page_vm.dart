@@ -4,6 +4,8 @@ import 'dart:isolate';
 import 'package:fcc_home/entity/file_info.dart';
 import 'package:fcc_home/home_global.dart';
 import 'package:fcc_home/net_client.dart';
+import 'package:fcc_home/repo/file_info_repo.dart';
+import 'package:fcc_home/repo/local_db_helper.dart';
 import 'package:fcc_home/vm/detail_virtual_vm.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,42 @@ import '../util/fileCrypto.dart';
 
 void wtd(SendPort port) {
   Isolate.exit(port, "welldone");
+}
+
+Future<void> genMd5s(List<dynamic> args) async {
+  // var client = NetClient();
+  List<String> md5s = [];
+  List<SyncInfo> entries = args[1];
+  print("file numbers ${entries.length}");
+  var tryCount = 0;
+  var map = {};
+  for (var entity in entries) {
+    //todo 打开处理本地md5的数量限制
+    if (tryCount >= 20) {
+      break;
+    }
+    var md5 = await getFileHash(entity.uri);
+    entity.md5 = md5;
+    md5s.add(md5);
+    // map[md5] = entity.name;
+    map[entity.uri] = md5;
+    tryCount += 1;
+  }
+  Isolate.exit(args[0], map);
+
+  // String? result = await client.checkFilesExist(md5s, "10");
+  // if (result != null) {
+  //   print("checkFileResult: $result");
+  //   List<dynamic> unSyncMd5s = json.decode(result);
+  //   var resultMap = {};
+  //   for (var md5 in unSyncMd5s) {
+  //     resultMap[map[md5]] = md5;
+  //   }
+  //   // mineEntries.refreshSyncState(unSyncMd5s);
+  //   Isolate.exit(args[0], resultMap);
+  // } else {
+  //   Isolate.exit(args[0], []);
+  // }
 }
 
 Future<void> checkFileSyncTop(List<dynamic> args) async {
@@ -30,6 +68,7 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
     map[md5] = entity.name;
     tryCount += 1;
   }
+
   String? result = await client.checkFilesExist(md5s, "10");
   if (result != null) {
     print("checkFileResult: $result");
@@ -56,6 +95,12 @@ class MinePageVM {
 
   var client = NetClient();
 
+  Future<void> initData() async {
+    await refreshDatas();
+    refreshMd5ByIsolate();
+  }
+
+  //获取并刷新数据
   Future<void> refreshDatas() async {
     List<SyncInfo> syncFiles = [];
 
@@ -100,6 +145,65 @@ class MinePageVM {
     // _listenToEvent();
   }
 
+  //
+  void refreshMd5ByIsolate() async {
+    var dbHelper = LocalDBHelper();
+    await dbHelper.initDB();
+
+    var uris = mineEntries.syncEntries.map((e) => e.uri).toList();
+
+    var existFiles = await dbHelper.retrieveFilesByPath(uris);
+    var existPath = existFiles.map((e) => e.path).toList();
+
+    print("exist db files: $existPath");
+
+    List<SyncInfo>? notExistFiles;
+    if (existPath.isNotEmpty) {
+      notExistFiles = mineEntries.syncEntries
+          .where((element) => !existPath.contains(element.uri))
+          .toList();
+    } else {
+      notExistFiles = mineEntries.syncEntries;
+    }
+
+    //get md5s
+    final resultPort = ReceivePort();
+    // 2
+    SendPort port = resultPort.sendPort;
+    // 3
+    var isolate =
+        // await Isolate.spawn(checkFileSyncTop, [port, mineEntries.syncEntries]);
+        await Isolate.spawn(genMd5s, [port, notExistFiles]);
+    // 4
+    Map result = await resultPort.first;
+    print("check files result: $result");
+
+    if (result.isNotEmpty) {
+      for (var element in mineEntries.syncEntries) {
+        if (result[element.uri] != null) {
+          element.md5 = result[element.uri];
+          print("insert new  ${element.md5}");
+          dbHelper.insertFileInfo(FileInfoRepo.fromMap({
+            'name': element.name,
+            'path': element.uri,
+            'type': element.uri.substring(element.uri.lastIndexOf('.') + 1),
+            'md5': element.md5,
+            'length': 0,
+            'sync': false
+          }));
+
+          // todo check files exist in server
+
+          // var uploadResult = await client.uploadLocalFile(
+          //     element.name, element.uri, "10", element.md5!);
+          // print("uploadresult: $uploadResult");
+        }
+      }
+      // mineEntries.refreshSyncState(result);
+    }
+  }
+
+  //
   void checkFilesByIsolate() async {
     // 1
     final resultPort = ReceivePort();
