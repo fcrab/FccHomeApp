@@ -54,7 +54,7 @@ Future<void> genMd5s(List<dynamic> args) async {
 Future<void> checkFileSyncTop(List<dynamic> args) async {
   var client = NetClient();
   List<String> md5s = [];
-  List<SyncInfo> entries = args[1];
+  List<FileInfoRepo> entries = args[1];
   print("file numbers ${entries.length}");
   var tryCount = 0;
   var map = {};
@@ -63,8 +63,9 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
     if (tryCount >= 20) {
       break;
     }
-    if (entity.md5 != null) {
-      md5s.add(entity.md5!);
+    if (entity.md5 != "") {
+      md5s.add(entity.md5);
+      map[entity.md5] = entity.name;
       tryCount += 1;
     }
   }
@@ -214,15 +215,28 @@ class MinePageVM {
     }
   }
 
-  //
+  //upload files
   void checkFilesByIsolate() async {
+    var dbHelper = LocalDBHelper();
+    await dbHelper.initDB();
+
+    var uris = mineEntries.syncEntries.map((e) => e.uri).toList();
+
+    var existFiles = await dbHelper.retrieveFilesByPath(uris);
+    // dbHelper.retrieveFileByPath(uri)
+    print("get exist db files ${existFiles.length}");
+    // for(var file in existFiles){
+    //   print(file.path);
+    // }
+
     // 1
     final resultPort = ReceivePort();
     // 2
     SendPort port = resultPort.sendPort;
     // 3
     var isolate =
-        await Isolate.spawn(checkFileSyncTop, [port, mineEntries.syncEntries]);
+        // await Isolate.spawn(checkFileSyncTop, [port, mineEntries.syncEntries]);
+        await Isolate.spawn(checkFileSyncTop, [port, existFiles]);
     // 4
     Map result = await resultPort.first;
     print("check files result: $result");
