@@ -20,19 +20,19 @@ Future<void> genMd5s(List<dynamic> args) async {
   List<String> md5s = [];
   List<SyncInfo> entries = args[1];
   print("file numbers ${entries.length}");
-  var tryCount = 0;
+  // var tryCount = 0;
   var map = {};
   for (var entity in entries) {
     //todo 打开处理本地md5的数量限制
-    if (tryCount >= 20) {
-      break;
-    }
+    // if (tryCount >= 20) {
+    //   break;
+    // }
     var md5 = await getFileHash(entity.uri);
     entity.md5 = md5;
     md5s.add(md5);
     // map[md5] = entity.name;
     map[entity.uri] = md5;
-    tryCount += 1;
+    // tryCount += 1;
   }
   Isolate.exit(args[0], map);
 
@@ -59,15 +59,26 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
   var tryCount = 0;
   var map = {};
   for (var entity in entries) {
+    //todo select from db
     if (tryCount >= 20) {
       break;
     }
-    var md5 = await getFileHash(entity.uri);
-    entity.md5 = md5;
-    md5s.add(md5);
-    map[md5] = entity.name;
-    tryCount += 1;
+    if (entity.md5 != null) {
+      md5s.add(entity.md5!);
+      tryCount += 1;
+    }
   }
+
+  // for (var entity in entries) {
+  //   if (tryCount >= 20) {
+  //     break;
+  //   }
+  //   var md5 = await getFileHash(entity.uri);
+  //   entity.md5 = md5;
+  //   md5s.add(md5);
+  //   map[md5] = entity.name;
+  //   tryCount += 1;
+  // }
 
   String? result = await client.checkFilesExist(md5s, "10");
   if (result != null) {
