@@ -23,6 +23,16 @@ class LoginInfo with ChangeNotifier {
       required this.status,
       required this.lastUpdateTime});
 
+  LoginInfo.cache(
+      {required this.id,
+      this.email = '',
+      this.salt = '',
+      this.phoneNumber = '',
+      this.status = 1,
+      this.lastUpdateTime = '',
+      this.name = '',
+      this.password = ''});
+
   LoginInfo.info({
     this.id = '',
     this.email = '',

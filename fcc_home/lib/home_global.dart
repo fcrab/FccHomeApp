@@ -18,6 +18,10 @@ class HomeGlobal {
     loginInfo = LoginInfo.fromJson(jsonObj);
   }
 
+  static saveAccess(LoginInfo info) async {
+    loginInfo = info;
+  }
+
   static saveAccessToken(String value) async {
     saveInfo("token", value);
     getLocalToken();
