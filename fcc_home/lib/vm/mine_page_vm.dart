@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../util/fileCrypto.dart';
 
+//test
 void wtd(SendPort port) {
   Isolate.exit(port, "welldone");
 }
@@ -109,7 +110,9 @@ class MinePageVM {
 
   Future<void> initData() async {
     await refreshDatas();
-    refreshMd5ByIsolate();
+
+    refreshAndCheckFiles();
+    // refreshMd5ByIsolate();
   }
 
   //获取并刷新数据
@@ -157,11 +160,8 @@ class MinePageVM {
     // _listenToEvent();
   }
 
-  //
-  void refreshMd5ByIsolate() async {
-    var dbHelper = LocalDBHelper();
-    await dbHelper.initDB();
-
+  //check and init file md5s in local db
+  Future<void> refreshMd5ByIsolate(dbHelper) async {
     var uris = mineEntries.syncEntries.map((e) => e.uri).toList();
 
     var existFiles = await dbHelper.retrieveFilesByPath(uris);
@@ -212,6 +212,38 @@ class MinePageVM {
         }
       }
       // mineEntries.refreshSyncState(result);
+    }
+  }
+
+  void refreshAndCheckFiles() async {
+    var dbHelper = LocalDBHelper();
+    await dbHelper.initDB();
+    await refreshMd5ByIsolate(dbHelper);
+
+    //todo test
+    var uris = mineEntries.syncEntries.map((e) => e.uri).toList();
+    var existFiles = await dbHelper.retrieveFilesByPath(uris);
+    var waitToChecks = existFiles.map((e) => e.md5).toList();
+    String? result =
+        await client.checkFilesExist(waitToChecks, HomeGlobal.token);
+    if (result != null) {
+      print("checkFileResult: $result");
+      List<dynamic> unSyncMd5s = json.decode(result);
+      var resultMap = {};
+      for (var info in mineEntries.syncEntries) {
+        var file =
+            existFiles.where((element) => element.path == info.uri).first;
+        info.md5 = file.md5;
+        if (unSyncMd5s.contains(file.md5)) {
+          info.syncState = false;
+          resultMap[file.md5] = false;
+        } else {
+          info.syncState = true;
+          resultMap[file.md5] = true;
+        }
+      }
+      //todo update
+      mineEntries.justRefreshTheState();
     }
   }
 
@@ -294,6 +326,10 @@ class MineFiles with ChangeNotifier {
         info.syncState = false;
       }
     }
+    notifyListeners();
+  }
+
+  void justRefreshTheState() {
     notifyListeners();
   }
 }
