@@ -100,6 +100,7 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
 class MinePageVM {
   MineFiles mineEntries = MineFiles();
 
+  //全图片路径数据
   List<String> entries = [];
 
   // List<SyncInfo> syncEntries = [];
@@ -112,6 +113,7 @@ class MinePageVM {
     await refreshDatas();
 
     refreshAndCheckFiles();
+
     // refreshMd5ByIsolate();
   }
 
@@ -224,25 +226,35 @@ class MinePageVM {
     var uris = mineEntries.syncEntries.map((e) => e.uri).toList();
     var existFiles = await dbHelper.retrieveFilesByPath(uris);
     var waitToChecks = existFiles.map((e) => e.md5).toList();
+
+    var start = 0;
+    while (start < waitToChecks.length) {
+      var end = start + 100;
+      if (end > waitToChecks.length) {
+        end = waitToChecks.length;
+      }
+      print("check list from $start to $end");
+      var checkList = waitToChecks.sublist(start, end);
+      await checkAndRefreshData(checkList, existFiles);
+      start = end;
+    }
+  }
+
+  Future<void> checkAndRefreshData(
+      waitToChecks, List<FileInfoRepo> existFiles) async {
     String? result =
         await client.checkFilesExist(waitToChecks, HomeGlobal.token);
     if (result != null) {
-      print("checkFileResult: $result");
+      print("checkFileResult");
       List<dynamic> unSyncMd5s = json.decode(result);
-      var resultMap = {};
-      for (var info in mineEntries.syncEntries) {
-        var file =
-            existFiles.where((element) => element.path == info.uri).first;
-        info.md5 = file.md5;
-        if (unSyncMd5s.contains(file.md5)) {
-          info.syncState = false;
-          resultMap[file.md5] = false;
-        } else {
-          info.syncState = true;
-          resultMap[file.md5] = true;
-        }
+
+      for (var unSyncMd5 in unSyncMd5s) {
+        var file = existFiles.firstWhere((element) => element.md5 == unSyncMd5);
+        var entity = mineEntries.syncEntries
+            .firstWhere((element) => element.uri == file.path);
+        entity.syncState = false;
       }
-      //todo update
+
       mineEntries.justRefreshTheState();
     }
   }
@@ -289,7 +301,7 @@ class MinePageVM {
   /// 检查文件同步状态
   Future<void> checkFileSync(List<dynamic> args) async {
     List<String> md5s = [];
-    print("file numbers ${mineEntries.syncEntries.length}");
+    // print("file numbers ${mineEntries.syncEntries.length}");
     for (var entity in mineEntries.syncEntries) {
       var md5 = await getFileHash(entity.uri);
       entity.md5 = md5;
@@ -370,7 +382,7 @@ class SyncInfo {
   String thumb;
   String? md5;
   FileInfo? info;
-  bool syncState = false;
+  bool syncState = true;
 
   SyncInfo({required this.name, required this.uri, required this.thumb});
 }

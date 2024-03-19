@@ -117,7 +117,8 @@ class NetClient {
     String checkUrl = "files/checkFiles";
     try{
       var map = {'user': token, 'files': md5s};
-      print("checkFiles data\n$map");
+      // print("checkFiles data\n$map");
+      print("checkFiles data");
       var response = await dio.post(baseUrl + checkUrl, queryParameters: map);
       return parseResult(response);
     }catch(exp){
