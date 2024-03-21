@@ -25,6 +25,15 @@ class LocalDBHelper {
     }
   }
 
+  Future<int> updateFileInfos(List<FileInfoRepo> files) async {
+    for (var info in files) {
+      await db!.update(fileTable, info.toMap(),
+          where: 'path = ?', whereArgs: [info.path]);
+      return 1;
+    }
+    return -1;
+  }
+
   Future<List<FileInfoRepo>> retrieveFiles(List<String> md5) async {
     if (db != null) {
       List<Map<String, Object?>> result =
