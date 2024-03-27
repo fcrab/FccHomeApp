@@ -40,7 +40,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // (_pageWidget[0] as MinePageWidget).vm.checkFilesByIsolate();
 
         //check file sync state
-        (_pageWidget[0] as MinePageWidget).vm.refreshAndCheckFiles();
+        // (_pageWidget[0] as MinePageWidget).vm.refreshAndCheckFiles();
+
+        //upload files
+        (_pageWidget[0] as MinePageWidget).vm.syncFiles();
         print("first run here");
         // _incrementCounter();
       },

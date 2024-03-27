@@ -71,17 +71,6 @@ Future<void> checkFileSyncTop(List<dynamic> args) async {
     }
   }
 
-  // for (var entity in entries) {
-  //   if (tryCount >= 20) {
-  //     break;
-  //   }
-  //   var md5 = await getFileHash(entity.uri);
-  //   entity.md5 = md5;
-  //   md5s.add(md5);
-  //   map[md5] = entity.name;
-  //   tryCount += 1;
-  // }
-
   String? result = await client.checkFilesExist(md5s, HomeGlobal.token);
   if (result != null) {
     print("checkFileResult: $result");
@@ -260,11 +249,11 @@ class MinePageVM {
   }
 
   //upload files
-  void checkFilesByIsolate() async {
+  Future<void> uploadFilesByIsolate(List<SyncInfo> uploadList) async {
     var dbHelper = LocalDBHelper();
     await dbHelper.initDB();
 
-    var uris = mineEntries.syncEntries.map((e) => e.uri).toList();
+    var uris = uploadList.map((e) => e.uri).toList();
 
     var existFiles = await dbHelper.retrieveFilesByPath(uris);
     // dbHelper.retrieveFileByPath(uri)
@@ -294,6 +283,12 @@ class MinePageVM {
           print("uploadresult: $uploadResult");
         }
       }
+      //todo update upload result
+
+      //todo update local db sync status
+
+      //todo update list
+
       // mineEntries.refreshSyncState(result);
     }
   }
@@ -317,7 +312,15 @@ class MinePageVM {
   }
 
   //同步文件
-  Future<void> syncFiles() async {}
+  Future<void> syncFiles() async {
+    List<SyncInfo> upload = [];
+    for (var index = 0; index < mineEntries.syncList.length; index++) {
+      if (mineEntries.syncList[index]) {
+        upload.add(mineEntries.syncEntries[index]);
+      }
+    }
+    await uploadFilesByIsolate(upload);
+  }
 }
 
 class MineFiles with ChangeNotifier {
