@@ -225,6 +225,8 @@ class MinePageVM {
       print("check list from $start to $end");
       var checkList = waitToChecks.sublist(start, end);
       await checkAndRefreshData(checkList, existFiles);
+      // todo update files sync status in local
+      // dbHelper.updateFileInfos(files);
       start = end;
     }
   }
