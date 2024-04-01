@@ -16,58 +16,33 @@ void wtd(SendPort port) {
   Isolate.exit(port, "welldone");
 }
 
+//generate md5
 Future<void> genMd5s(List<dynamic> args) async {
-  // var client = NetClient();
   List<String> md5s = [];
   List<SyncInfo> entries = args[1];
   print("file numbers ${entries.length}");
-  // var tryCount = 0;
   var map = {};
   for (var entity in entries) {
-    //todo 打开处理本地md5的数量限制
-    // if (tryCount >= 20) {
-    //   break;
-    // }
     var md5 = await getFileHash(entity.uri);
     entity.md5 = md5;
     md5s.add(md5);
-    // map[md5] = entity.name;
     map[entity.uri] = md5;
-    // tryCount += 1;
   }
   Isolate.exit(args[0], map);
-
-  // String? result = await client.checkFilesExist(md5s, "10");
-  // if (result != null) {
-  //   print("checkFileResult: $result");
-  //   List<dynamic> unSyncMd5s = json.decode(result);
-  //   var resultMap = {};
-  //   for (var md5 in unSyncMd5s) {
-  //     resultMap[map[md5]] = md5;
-  //   }
-  //   // mineEntries.refreshSyncState(unSyncMd5s);
-  //   Isolate.exit(args[0], resultMap);
-  // } else {
-  //   Isolate.exit(args[0], []);
-  // }
 }
 
+//check file exist in server before upload
 Future<void> checkFileSyncTop(List<dynamic> args) async {
   var client = NetClient();
   List<String> md5s = [];
   List<FileInfoRepo> entries = args[1];
   print("file numbers ${entries.length}");
-  var tryCount = 0;
   var map = {};
   for (var entity in entries) {
     //todo select from db
-    if (tryCount >= 20) {
-      break;
-    }
     if (entity.md5 != "") {
       md5s.add(entity.md5);
       map[entity.md5] = entity.name;
-      tryCount += 1;
     }
   }
 
