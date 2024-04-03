@@ -251,6 +251,8 @@ class MinePageVM {
     Map result = await resultPort.first;
     print("check files result: $result");
     if (result.isNotEmpty) {
+      List<FileInfoRepo> updateFiles = [];
+
       for (var element in mineEntries.syncEntries) {
         if (result[element.name] != null) {
           element.md5 = result[element.name];
@@ -258,8 +260,34 @@ class MinePageVM {
           var uploadResult = await client.uploadLocalFile(
               element.name, element.uri, HomeGlobal.token, element.md5!);
           print("uploadresult: $uploadResult");
+          //判断是否上传成功
+          if (true) {
+            element.syncState = true;
+            updateFiles.add(FileInfoRepo.fromMap({
+              'name': element.name,
+              'path': element.uri,
+              'type': element.uri.substring(element.uri.lastIndexOf('.') + 1),
+              'md5': element.md5,
+              'length': 0,
+              'sync': false
+            }));
+          }
+        } else {
+          //mark local file sync
+          element.syncState = true;
+          updateFiles.add(FileInfoRepo.fromMap({
+            'name': element.name,
+            'path': element.uri,
+            'type': element.uri.substring(element.uri.lastIndexOf('.') + 1),
+            'md5': element.md5,
+            'length': 0,
+            'sync': false
+          }));
         }
       }
+
+      dbHelper.updateFileInfos(updateFiles);
+
       //todo update upload result
 
       //todo update local db sync status
