@@ -90,7 +90,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
       child: Consumer<MineFiles>(
         builder: (ctx, info, child) => GridView.count(
           crossAxisCount: 2,
-          children: List.generate(info.syncEntries.length, (index) {
+          children: List.generate(info.localEntries.length, (index) {
             return Container(
                 // child: Center(child: Image.network(entries[index])),
                 padding: const EdgeInsets.all(4),
@@ -100,7 +100,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                     fit: StackFit.expand,
                     children: [
                       Image(
-                        image: FileImage(File(info.syncEntries[index].thumb),
+                        image: FileImage(File(info.localEntries[index].thumb),
                             scale: 0.1),
                         height: 150,
                         fit: BoxFit.cover,
@@ -110,14 +110,14 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                         right: 10,
                         bottom: 10,
                         child: Visibility(
-                            visible: !info.syncEntries[index].syncState,
+                            visible: !info.localEntries[index].syncState,
                             child: Checkbox(
                               checkColor: Colors.white,
-                              value: info.syncList[index],
+                              value: info.syncMarks[index],
                               onChanged: (bool? value) {
                                 // setState(() {
                                 print("item $index change to value: $value");
-                                info.syncList[index] = value!;
+                                info.syncMarks[index] = value!;
                                 info.notifyListeners();
                                 // });
                               },
