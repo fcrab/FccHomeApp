@@ -255,37 +255,17 @@ class MinePageVM {
           //判断是否上传成功
           if (true) {
             element.syncState = true;
-            updateFiles.add(FileInfoRepo.fromMap({
-              'name': element.name,
-              'path': element.uri,
-              'type': element.uri.substring(element.uri.lastIndexOf('.') + 1),
-              'md5': element.md5,
-              'length': 0,
-              'sync': false
-            }));
+            updateFiles.add(element.toFileInfos());
           }
         } else {
           //mark local file sync
           element.syncState = true;
-          updateFiles.add(FileInfoRepo.fromMap({
-            'name': element.name,
-            'path': element.uri,
-            'type': element.uri.substring(element.uri.lastIndexOf('.') + 1),
-            'md5': element.md5,
-            'length': 0,
-            'sync': false
-          }));
+          updateFiles.add(element.toFileInfos());
         }
       }
 
       dbHelper.updateFileInfos(updateFiles);
       mineEntries.justRefreshTheState();
-      //todo update upload result
-
-      //todo update local db sync status
-
-      //todo update list
-
       // mineEntries.refreshSyncState(result);
     }
   }
@@ -385,6 +365,17 @@ class SyncInfo {
   String? md5;
   FileInfo? info;
   bool syncState = true;
+
+  FileInfoRepo toFileInfos() {
+    return FileInfoRepo.fromMap({
+      'name': name,
+      'path': uri,
+      'type': uri.substring(uri.lastIndexOf('.') + 1),
+      'md5': md5,
+      'length': 0,
+      'sync': syncState
+    });
+  }
 
   SyncInfo({required this.name, required this.uri, required this.thumb});
 }
