@@ -203,22 +203,27 @@ class MinePageVM {
     if (result != null) {
       List<dynamic> unSyncMd5s = json.decode(result);
       print("check files result: $result");
-      List<FileInfoRepo> updateFiles = [];
-      mineEntries.localEntries
+      //todo bug here md5 == null
+      // List<FileInfoRepo> updateFiles = [];
+      localUploadInfos
           .where((element) => unSyncMd5s.contains(element.md5))
           .forEach((unit) async {
         print("uploadfile ${unit.md5}");
         var uploadResult = await client.uploadLocalFile(
-            unit.name, unit.uri, HomeGlobal.token, unit.md5!);
+            unit.name, unit.path, HomeGlobal.token, unit.md5);
         print("uploadresult: $uploadResult");
         //判断是否上传成功
         if (true) {
-          unit.syncState = true;
-          updateFiles.add(unit.toFileInfos());
+          mineEntries.localEntries
+              .firstWhere((element) => element.uri == unit.path)
+              .syncState = true;
+          // entity.syncState = true;
+          // updateFiles.add(entity.toFileInfos());
+          mineEntries.justRefreshTheState();
         }
       });
-      dbHelper.updateFileInfos(updateFiles);
-      mineEntries.justRefreshTheState();
+      //todo wait to fix
+      // dbHelper.updateFileInfos(updateFiles);
     }
   }
 
