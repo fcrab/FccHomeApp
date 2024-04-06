@@ -25,6 +25,7 @@ class AuthVM {
   // todo test
   Future<void> verifyLocal() async {
     await HomeGlobal.getLocalToken();
+    print("login info : ${HomeGlobal.token}");
     if (HomeGlobal.token != "") {
       var info = LoginInfo.cache(id: HomeGlobal.token);
       HomeGlobal.saveAccess(info);

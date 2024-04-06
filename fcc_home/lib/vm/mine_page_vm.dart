@@ -31,35 +31,6 @@ Future<void> genMd5s(List<dynamic> args) async {
   Isolate.exit(args[0], map);
 }
 
-//check file exist in server before upload
-Future<void> checkFileSyncTop(List<dynamic> args) async {
-  var client = NetClient();
-  List<String> md5s = [];
-  List<FileInfoRepo> entries = args[1];
-  print("file numbers ${entries.length}");
-  var map = {};
-  for (var entity in entries) {
-    //todo select from db
-    if (entity.md5 != "") {
-      md5s.add(entity.md5);
-      map[entity.md5] = entity.name;
-    }
-  }
-
-  String? result = await client.checkFilesExist(md5s, HomeGlobal.token);
-  if (result != null) {
-    print("checkFileResult: $result");
-    List<dynamic> unSyncMd5s = json.decode(result);
-    var resultMap = {};
-    for (var md5 in unSyncMd5s) {
-      resultMap[map[md5]] = md5;
-    }
-    // mineEntries.refreshSyncState(unSyncMd5s);
-    Isolate.exit(args[0], resultMap);
-  } else {
-    Isolate.exit(args[0], []);
-  }
-}
 
 class MinePageVM {
   MineFiles mineEntries = MineFiles();
@@ -224,49 +195,30 @@ class MinePageVM {
 
     var uris = uploadList.map((e) => e.uri).toList();
 
-    var existFiles = await dbHelper.retrieveFilesByPath(uris);
-    // dbHelper.retrieveFileByPath(uri)
-    print("get exist db files ${existFiles.length}");
-    // for(var file in existFiles){
-    //   print(file.path);
-    // }
+    var localUploadInfos = await dbHelper.retrieveFilesByPath(uris);
+    print("get exist db files ${localUploadInfos.length}");
 
-    // 1
-    final resultPort = ReceivePort();
-    // 2
-    SendPort port = resultPort.sendPort;
-    // 3
-    var isolate =
-        // await Isolate.spawn(checkFileSyncTop, [port, mineEntries.syncEntries]);
-        await Isolate.spawn(checkFileSyncTop, [port, existFiles]);
-    // 4
-    Map result = await resultPort.first;
-    print("check files result: $result");
-    if (result.isNotEmpty) {
+    String? result = await client.checkFilesExist(
+        localUploadInfos.map((e) => e.md5).toList(), HomeGlobal.token);
+    if (result != null) {
+      List<dynamic> unSyncMd5s = json.decode(result);
+      print("check files result: $result");
       List<FileInfoRepo> updateFiles = [];
-
-      for (var element in mineEntries.localEntries) {
-        if (result[element.name] != null) {
-          element.md5 = result[element.name];
-          print("uploadfile ${element.md5}");
-          var uploadResult = await client.uploadLocalFile(
-              element.name, element.uri, HomeGlobal.token, element.md5!);
-          print("uploadresult: $uploadResult");
-          //判断是否上传成功
-          if (true) {
-            element.syncState = true;
-            updateFiles.add(element.toFileInfos());
-          }
-        } else {
-          //mark local file sync
-          element.syncState = true;
-          updateFiles.add(element.toFileInfos());
+      mineEntries.localEntries
+          .where((element) => unSyncMd5s.contains(element.md5))
+          .forEach((unit) async {
+        print("uploadfile ${unit.md5}");
+        var uploadResult = await client.uploadLocalFile(
+            unit.name, unit.uri, HomeGlobal.token, unit.md5!);
+        print("uploadresult: $uploadResult");
+        //判断是否上传成功
+        if (true) {
+          unit.syncState = true;
+          updateFiles.add(unit.toFileInfos());
         }
-      }
-
+      });
       dbHelper.updateFileInfos(updateFiles);
       mineEntries.justRefreshTheState();
-      // mineEntries.refreshSyncState(result);
     }
   }
 
