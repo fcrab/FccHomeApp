@@ -1,6 +1,9 @@
+import 'package:fcc_home/auth_page.dart';
+import 'package:fcc_home/home_global.dart';
 import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 import 'mine_page_widget.dart';
 
@@ -16,6 +19,8 @@ class HomePageWidget extends StatefulWidget {
 
 class _HomePageWidgetState extends State<HomePageWidget>
     with WidgetsBindingObserver {
+  late SimpleFontelicoProgressDialog _progressDialog;
+
   _HomePageWidgetState(this.defaultTargetPlatform) : super();
   static const platform = MethodChannel("com.crabfibber.fcc_home/event");
   final TargetPlatform defaultTargetPlatform;
@@ -30,12 +35,18 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   @override
   void initState() {
+    _progressDialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+
     syncBtn = genSyncBtn();
   }
 
   FloatingActionButton genSyncBtn() {
     return FloatingActionButton(
-      onPressed: () {
+      onPressed: () async {
+        print("click upload");
+        _progressDialog.show(message: "正在同步文件");
+
         //upload file test
         // (_pageWidget[0] as MinePageWidget).vm.checkFilesByIsolate();
 
@@ -43,8 +54,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // (_pageWidget[0] as MinePageWidget).vm.refreshAndCheckFiles();
 
         //upload files
-        (_pageWidget[0] as MinePageWidget).vm.syncFiles();
-        print("first run here");
+        await (_pageWidget[0] as MinePageWidget).vm.syncFiles();
+        _progressDialog.hide();
+
         // _incrementCounter();
       },
       tooltip: 'syncfiles',
@@ -71,6 +83,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   @override
   Widget build(BuildContext context) {
+    String name =
+        HomeGlobal.loginInfo != null ? HomeGlobal.loginInfo!.name : "";
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -91,8 +105,32 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // ),
         // ],
       ),
-      drawer: const Drawer(
-        child: Text("test"),
+
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFFFF8F00)),
+              child: Text(name),
+            ),
+            ListTile(
+              title: const Text('个人中心'),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text('退出登录'),
+              onTap: () {
+                HomeGlobal.clean();
+                // Navigator.pushNamed(context, "/");
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => AuthPage()),
+                    (route) => false);
+              },
+            )
+          ],
+        ),
       ),
       body: Center(
         // child: _pageWidget.elementAt(_selectedIndex),

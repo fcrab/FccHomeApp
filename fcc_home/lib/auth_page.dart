@@ -34,6 +34,7 @@ class AuthPageState extends State<AuthPage> {
         create: (context) => widget.vm.loginInfo,
         child: AuthPageBody(
             login: widget.vm.sendLogin,
+            // login: widget.vm.sendTest,
             register: widget.vm.sendRegister,
             verifyLocal: widget.vm.verifyLocal),
       ),

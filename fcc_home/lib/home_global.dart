@@ -49,4 +49,14 @@ class HomeGlobal {
     result = prefs.getString(key);
     return result;
   }
+
+  static String getUsername() {
+    return HomeGlobal.loginInfo != null ? HomeGlobal.loginInfo!.name : "";
+  }
+
+  static clean() async {
+    saveAccessToken("");
+    token = "";
+    loginInfo = null;
+  }
 }

@@ -14,7 +14,7 @@ class AuthVM {
 
   var client = NetClient();
 
-  void sendTest(String userName, String password) {
+  Future<void> sendTest(String userName, String password) async {
     // loginInfo = LoginInfo.test();
     // loginInfo.notifyListeners();
     print("vm test has been called");
