@@ -21,8 +21,8 @@ class FileInfo {
         id: dataMap['id'] as int,
         name: dataMap['name'],
         url: dataMap['url'],
-        thumb: dataMap['thumb'],
-        md5: dataMap['md5'],
+        thumb: dataMap['thumbUrl'],
+        md5: (dataMap['md5'] != null) ? dataMap['md5'] : "",
         createTime: DateTime.now(),
         lastModify: DateTime.now());
 
