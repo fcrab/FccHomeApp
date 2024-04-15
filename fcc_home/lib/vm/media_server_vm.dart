@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fcc_home/vm/detail_virtual_vm.dart';
 import 'package:flutter/material.dart';
 
 import '../entity/file_info.dart';
@@ -157,6 +158,10 @@ class MediaServerVM {
     // }
     // return true;
   }
+
+  DetailVirtualVM getDisplayVm(List<FileInfo> datas) {
+    return ServerVirualVM(datas);
+  }
 }
 
 // binding data
@@ -262,5 +267,36 @@ class MediaInfos with ChangeNotifier {
 
   int getTotal() {
     return dirInfos.dirs.length + fileInfos.total;
+  }
+}
+
+class ServerVirualVM extends DetailVirtualVM {
+  List<FileInfo> datas = [];
+
+  ServerVirualVM(this.datas);
+
+  @override
+  void goBack() {}
+
+  @override
+  void goToNext() {}
+
+  @override
+  Future<void> removeAt(int index) async {
+    // dynamic result =
+    // await HomeGlobal.platform.invokeMethod("delete", datas[index]['id']);
+    // datas.removeAt(index);
+    //todo del file from server
+  }
+
+  @override
+  Map<String, dynamic> getInfo(int index) {
+    return datas[index].toInfo();
+  }
+
+  @override
+  String getUrl(int index) {
+    // var url = datas[index].url;
+    return datas[index].url;
   }
 }

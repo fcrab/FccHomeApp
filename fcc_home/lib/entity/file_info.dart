@@ -32,4 +32,8 @@ class FileInfo {
 
   FileInfo.name(this.id, this.name, this.url, this.thumb, this.md5,
       this.createTime, this.lastModify);
+
+  Map<String, dynamic> toInfo() {
+    return {'name': name, 'url': url, 'thumb': thumb};
+  }
 }

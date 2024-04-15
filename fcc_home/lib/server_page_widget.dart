@@ -44,7 +44,7 @@ class ServerPageState extends State<ServerPageWidget>
         ChangeNotifierProvider<MediaInfos>(create: (ctx) => widget.vm.infos)
       ],
       child: PhotoWall(widget.vm.fetchUserDataInDir, widget.vm.fetchUserDirs,
-          widget.vm.fetchPicsData),
+          widget.vm.fetchPicsData, widget.vm.getDisplayVm),
     );
   }
 }
@@ -70,7 +70,8 @@ class FolderStack {
 }
 
 class PhotoWall extends StatefulWidget {
-  PhotoWall(this.getDirAndFiles, this.getDirs, this.getNextPage);
+  PhotoWall(
+      this.getDirAndFiles, this.getDirs, this.getNextPage, this.getDisplayVm);
 
   bool isRoot = true;
 
@@ -89,6 +90,8 @@ class PhotoWall extends StatefulWidget {
   // Function refreshFiles;
 
   Function getNextPage;
+
+  Function getDisplayVm;
 
   @override
   State<StatefulWidget> createState() {
@@ -223,10 +226,17 @@ class WallState extends State<PhotoWall> {
                 },
               );
             } else {
+              String imgUrl;
+              if (mediaList.list[index].file!.thumb.isEmpty) {
+                imgUrl = mediaList.list[index].file!.url;
+              } else {
+                imgUrl = mediaList.list[index].file!.thumb;
+              }
+
               return Container(
                   padding: const EdgeInsets.only(top: 4),
                   child: GestureDetector(
-                    child: Image.network(mediaList.list[index].file!.url,
+                    child: Image.network(imgUrl,
                         height: 300,
                         fit: BoxFit.cover,
                         filterQuality: FilterQuality.low),
@@ -234,13 +244,28 @@ class WallState extends State<PhotoWall> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DisplayPage(
-                                    url: mediaList.fileInfos.dataList
-                                        .map((e) => e.url)
-                                        .toList(),
-                                    index:
-                                        index - mediaList.dirInfos.dirs.length,
-                                  )));
+                                  builder: (context) => DisplayPage.mode(
+                                      url: mediaList.fileInfos.dataList
+                                          .map((e) => e.url)
+                                          .toList(),
+                                      index: index,
+                                      mode: ImgType.NETWORK,
+                                      virtualVM: widget.getDisplayVm(
+                                          mediaList.fileInfos.dataList))))
+                          .then((value) {
+                        setState(() {});
+                      });
+
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => DisplayPage(
+                      //               url: mediaList.fileInfos.dataList
+                      //                   .map((e) => e.url)
+                      //                   .toList(),
+                      // index:
+                      //                   index - mediaList.dirInfos.dirs.length,
+                      //             )));
                     },
                   ));
             }
