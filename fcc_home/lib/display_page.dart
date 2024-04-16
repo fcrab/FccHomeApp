@@ -45,6 +45,8 @@ class DisplayPage extends StatefulWidget {
 
 class DisplayPageState extends State<DisplayPage> {
   late PageController controller;
+  var barTitle = "";
+  var pageIndex = -1;
 
   @override
   void dispose() {
@@ -56,14 +58,16 @@ class DisplayPageState extends State<DisplayPage> {
   void initState() {
     super.initState();
     controller = PageController(initialPage: widget.index);
+    barTitle = widget.vm.getName(widget.index);
+    pageIndex = widget.index;
   }
 
-  var barTitle = "";
-
-  //todo why does it not work?
-  void setBarTitle() {
-    barTitle = widget.vm.getName(widget.index);
-    setState(() {});
+  void setBarTitle(int index) {
+    var titleName = widget.vm.getName(index);
+    print("init: $index name: $titleName");
+    setState(() {
+      barTitle = titleName;
+    });
   }
 
   @override
@@ -71,16 +75,14 @@ class DisplayPageState extends State<DisplayPage> {
     var children = <Widget>[];
     for (int count = 0; count < widget.vm.urls.length; count++) {
       children.add(PageImgWidget(
-          type: widget.mode,
-          url: widget.vm.urls[count],
-          changeTitle: setBarTitle));
+          type: widget.mode, url: widget.vm.urls[count]));
     }
 
     var barActions = [
       IconButton(
           onPressed: () {
             setState(() {
-              widget.vm.deletePic(widget.index);
+              widget.vm.deletePic(pageIndex);
             });
           },
           icon: const Icon(Icons.delete_outline))
@@ -97,6 +99,10 @@ class DisplayPageState extends State<DisplayPage> {
       body: PageView(
         controller: controller,
         children: children,
+        onPageChanged: (int index) {
+          pageIndex = index;
+          setBarTitle(index);
+        },
       ),
       // body:
       //   GestureDetector(
@@ -111,14 +117,11 @@ class PageImgWidget extends StatefulWidget {
 
   String url;
 
-  var changeTitle;
-
   PageImgWidget(
       {Key? key,
       required this.type,
-      required this.url,
-      required this.changeTitle})
-      : super(key: key);
+    required this.url,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -131,7 +134,6 @@ class PageImgState extends State<PageImgWidget> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      widget.changeTitle();
     });
   }
 
