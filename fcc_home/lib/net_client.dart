@@ -26,9 +26,9 @@ class NetClient {
 
   // String baseUrl = "http://172.16.73.222:8080/";
   //local
-  String baseUrl = "http://192.168.31.193:8080/";
+  // String baseUrl = "http://192.168.31.193:8080/";
 
-  // String baseUrl = "http://192.168.31.205:8080/";
+  String baseUrl = "http://192.168.31.205:8080/";
 
   // 注册
   Future<String?> register(String name, String psw) async {

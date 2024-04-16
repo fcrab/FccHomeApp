@@ -237,9 +237,9 @@ class WallState extends State<PhotoWall> {
                   padding: const EdgeInsets.only(top: 4),
                   child: GestureDetector(
                     child: Image.network(imgUrl,
-                        height: 300,
+                        height: 400,
                         fit: BoxFit.cover,
-                        filterQuality: FilterQuality.low),
+                        filterQuality: FilterQuality.medium),
                     onTap: () {
                       Navigator.push(
                           context,

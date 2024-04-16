@@ -15,6 +15,6 @@ class DisplayVM {
   }
 
   String getName(int index) {
-    return virtualVM?.getInfo(index)["name"];
+    return virtualVM != null ? (virtualVM!.getInfo(index)["name"]) : "";
   }
 }

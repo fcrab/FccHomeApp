@@ -58,12 +58,22 @@ class DisplayPageState extends State<DisplayPage> {
     controller = PageController(initialPage: widget.index);
   }
 
+  var barTitle = "";
+
+  //todo why does it not work?
+  void setBarTitle() {
+    barTitle = widget.vm.getName(widget.index);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     var children = <Widget>[];
     for (int count = 0; count < widget.vm.urls.length; count++) {
-      children
-          .add(PageImgWidget(type: widget.mode, url: widget.vm.urls[count]));
+      children.add(PageImgWidget(
+          type: widget.mode,
+          url: widget.vm.urls[count],
+          changeTitle: setBarTitle));
     }
 
     var barActions = [
@@ -81,7 +91,7 @@ class DisplayPageState extends State<DisplayPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("display"),
+        title: Text(barTitle),
         actions: barActions,
       ),
       body: PageView(
@@ -101,7 +111,13 @@ class PageImgWidget extends StatefulWidget {
 
   String url;
 
-  PageImgWidget({Key? key, required this.type, required this.url})
+  var changeTitle;
+
+  PageImgWidget(
+      {Key? key,
+      required this.type,
+      required this.url,
+      required this.changeTitle})
       : super(key: key);
 
   @override
@@ -111,6 +127,14 @@ class PageImgWidget extends StatefulWidget {
 }
 
 class PageImgState extends State<PageImgWidget> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      widget.changeTitle();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.type == ImgType.NETWORK) {
