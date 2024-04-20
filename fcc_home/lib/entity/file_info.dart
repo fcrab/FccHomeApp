@@ -34,6 +34,11 @@ class FileInfo {
       this.createTime, this.lastModify);
 
   Map<String, dynamic> toInfo() {
-    return {'name': name, 'url': url, 'thumb': thumb};
+    return {
+      'name': name,
+      'url': url,
+      'thumb': thumb,
+      "date": createTime.second
+    };
   }
 }

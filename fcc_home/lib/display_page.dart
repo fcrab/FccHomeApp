@@ -46,6 +46,7 @@ class DisplayPage extends StatefulWidget {
 class DisplayPageState extends State<DisplayPage> {
   late PageController controller;
   var barTitle = "";
+  var barSubTitle = "";
   var pageIndex = -1;
 
   @override
@@ -58,15 +59,17 @@ class DisplayPageState extends State<DisplayPage> {
   void initState() {
     super.initState();
     controller = PageController(initialPage: widget.index);
-    barTitle = widget.vm.getName(widget.index);
+    barTitle = widget.vm.getDate(widget.index)['title'] ?? "";
+    barSubTitle = widget.vm.getDate(widget.index)['extra'] ?? "";
     pageIndex = widget.index;
   }
 
   void setBarTitle(int index) {
-    var titleName = widget.vm.getName(index);
-    print("init: $index name: $titleName");
+    // var titleName = widget.vm.getDate(index);
+    // print("init: $index name: $titleName");
     setState(() {
-      barTitle = titleName;
+      barTitle = widget.vm.getDate(index)['title'] ?? "";
+      barSubTitle = widget.vm.getDate(index)['extra'] ?? "";
     });
   }
 
@@ -93,7 +96,9 @@ class DisplayPageState extends State<DisplayPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(barTitle),
+        title: Column(
+          children: [Text(barTitle), Text(barSubTitle)],
+        ),
         actions: barActions,
       ),
       body: PageView(
