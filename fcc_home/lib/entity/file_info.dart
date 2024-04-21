@@ -38,7 +38,7 @@ class FileInfo {
       'name': name,
       'url': url,
       'thumb': thumb,
-      "date": createTime.second
+      "date": createTime.millisecond / 1000
     };
   }
 }
