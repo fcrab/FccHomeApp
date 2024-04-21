@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 import 'display_page.dart';
 
 class MinePageWidget extends StatefulWidget {
-  MinePageWidget({Key? key}) : super(key: key);
+  MinePageWidget({Key? key, required this.homeAction}) : super(key: key);
+
+  Function homeAction;
 
   var vm = MinePageVM();
 
@@ -29,6 +31,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
     print("demo page init state");
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (defaultTargetPlatform == TargetPlatform.android) {
+        widget.homeAction("我的相册");
         await widget.vm.initData();
         // widget.vm.checkFileSync();
         // isChecked = List.filled(widget.vm.entries.length, false);

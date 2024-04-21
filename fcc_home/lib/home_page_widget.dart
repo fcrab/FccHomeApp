@@ -11,7 +11,7 @@ class HomePageWidget extends StatefulWidget {
   HomePageWidget({Key? key, required this.title, required this.platform})
       : super(key: key);
   final TargetPlatform platform;
-  final String title;
+  String title;
 
   @override
   State<HomePageWidget> createState() => _HomePageWidgetState(platform);
@@ -31,7 +31,15 @@ class _HomePageWidgetState extends State<HomePageWidget>
     setState(() {});
   }
 
+  void setTitle(String barTitle) {
+    setState(() {
+      widget.title = barTitle;
+    });
+  }
+
   int _selectedIndex = 0;
+
+  static late List<Widget> _pageWidget;
 
   @override
   void initState() {
@@ -39,6 +47,11 @@ class _HomePageWidgetState extends State<HomePageWidget>
         context: context, barrierDimisable: false);
 
     syncBtn = genSyncBtn();
+
+    _pageWidget = <Widget>[
+      MinePageWidget(homeAction: setTitle),
+      ServerPageWidget()
+    ];
   }
 
   FloatingActionButton genSyncBtn() {
@@ -63,11 +76,6 @@ class _HomePageWidgetState extends State<HomePageWidget>
       child: const Icon(Icons.sync),
     );
   }
-
-  static final List<Widget> _pageWidget = <Widget>[
-    MinePageWidget(),
-    ServerPageWidget()
-  ];
 
   void _onTapItem(int index) {
     setState(() {

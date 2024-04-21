@@ -1,5 +1,3 @@
-import 'package:fcc_home/mine_page_widget.dart';
-import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -38,8 +36,8 @@ class MyApp extends StatelessWidget {
       routes: {
         "home": (context) =>
             HomePageWidget(title: 'Home Page', platform: defaultTargetPlatform),
-        "mine_page": (context) => MinePageWidget(),
-        "server_page": (context) => ServerPageWidget(),
+        // "mine_page": (context) => MinePageWidget(homeAction: (title)=>{},),
+        // "server_page": (context) => ServerPageWidget(),
         // "display_page":(context)=> DisplayPage(),
         // "auth": (context) => AuthPage()
         "/": (context) => AuthPage()
