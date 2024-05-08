@@ -2,7 +2,6 @@ import 'package:fcc_home/auth_page.dart';
 import 'package:fcc_home/home_global.dart';
 import 'package:fcc_home/server_page_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 import 'mine_page_widget.dart';
@@ -22,14 +21,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
   late SimpleFontelicoProgressDialog _progressDialog;
 
   _HomePageWidgetState(this.defaultTargetPlatform) : super();
-  static const platform = MethodChannel("com.crabfibber.fcc_home/event");
   final TargetPlatform defaultTargetPlatform;
 
   FloatingActionButton? syncBtn;
-
-  void _incrementCounter() {
-    setState(() {});
-  }
 
   void setTitle(String barTitle) {
     setState(() {
