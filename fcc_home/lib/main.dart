@@ -1,3 +1,4 @@
+import 'package:fcc_home/personal_center.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         // "server_page": (context) => ServerPageWidget(),
         // "display_page":(context)=> DisplayPage(),
         // "auth": (context) => AuthPage()
+        "personal_page": (context) => PersonalCenter(),
         "/": (context) => AuthPage()
       },
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
