@@ -55,7 +55,10 @@ class HomeGlobal {
   }
 
   static clean() async {
-    saveAccessToken("");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("token");
+    prefs.remove("refresh");
+    prefs.remove("user");
     token = "";
     loginInfo = null;
   }

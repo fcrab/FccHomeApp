@@ -118,7 +118,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
             ),
             ListTile(
               title: const Text('个人中心'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, "personal_page");
+              },
             ),
             ListTile(
               title: const Text('退出登录'),

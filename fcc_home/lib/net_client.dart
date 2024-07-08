@@ -70,6 +70,11 @@ class NetClient {
     return null;
   }
 
+  //todo no need to do this temperary
+  Future<String?> postLogout(String token) async {
+    return null;
+  }
+
   //刷新token
   Future<String?> refreshToken(String refreshToken) async {
     String tokenUrl = "token/refresh";

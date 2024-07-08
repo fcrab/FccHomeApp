@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:fcc_home/entity/login_info.dart';
+import 'package:flutter/foundation.dart';
 
 import '../home_global.dart';
 import '../net_client.dart';
@@ -36,20 +37,33 @@ class AuthVM {
   Future<void> sendLogin(userName, password) async {
     try {
       var loginStr = await client.postLogin(userName, password);
-      if (loginStr != null) {
-        Map<String, dynamic> jsonObj = json.decode(loginStr);
-        var info = LoginInfo.fromJson(jsonObj);
-        HomeGlobal.saveAccessInfo(loginStr);
-        HomeGlobal.saveAccessToken(info.id);
-        loginInfo.refreshData(info);
-      }
+      // if (loginStr != null) {
+      //   Map<String, dynamic> jsonObj = json.decode(loginStr);
+      //   var info = LoginInfo.fromJson(jsonObj);
+      //   HomeGlobal.saveAccessInfo(loginStr);
+      //   HomeGlobal.saveAccessToken(info.id);
+      //   loginInfo.refreshData(info);
+      // }
       //test
-      // loginInfo.refreshData(LoginInfo.test());
+      loginInfo.refreshData(LoginInfo.test());
       // HomeGlobal.saveAccessToken(loginInfo.id);
     } catch (exp) {
       print(exp);
     } finally {
       // _progressDialog.hide();
+    }
+  }
+
+  Future<void> sendLogout() async {
+    try {
+      if (HomeGlobal.token.isNotEmpty) {
+        // var logoutStr = await client.postLogout(HomeGlobal.token);
+        await HomeGlobal.clean();
+      }
+    } catch (exp) {
+      if (kDebugMode) {
+        print(exp);
+      }
     }
   }
 
