@@ -38,7 +38,7 @@ class FileInfo {
       'name': name,
       'url': url,
       'thumb': thumb,
-      "date": createTime.millisecond / 1000
+      "date": (createTime.millisecondsSinceEpoch ~/ 1000).toString()
     };
   }
 }
