@@ -24,11 +24,19 @@ class HomeGlobal {
 
   static saveAccessToken(String value) async {
     saveInfo("token", value);
-    getLocalToken();
+    await getLocalToken();
   }
 
   static saveRefreshToken(String value) async {
     saveInfo("refresh", value);
+  }
+
+  static getAccessInfo() async {
+    var loginInfoStr = await getLocalInfo("user");
+    if (loginInfoStr != null) {
+      Map<String, dynamic> jsonObj = json.decode(loginInfoStr);
+      loginInfo = LoginInfo.fromJson(jsonObj);
+    }
   }
 
   static getLocalToken() async {

@@ -28,9 +28,11 @@ class AuthVM {
     await HomeGlobal.getLocalToken();
     print("login info : ${HomeGlobal.token}");
     if (HomeGlobal.token != "") {
+      //todo 获取完整信息
       var info = LoginInfo.cache(id: HomeGlobal.token);
       HomeGlobal.saveAccess(info);
-      loginInfo.refreshData(LoginInfo.cache(id: HomeGlobal.token));
+      await HomeGlobal.getAccessInfo();
+      // loginInfo.refreshData(LoginInfo.cache(id: HomeGlobal.token));
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:fcc_home/home_global.dart';
 import 'package:fcc_home/vm/auth_vm.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,9 @@ class PersonalCenter extends StatefulWidget {
 
 class PersonalCenterState extends State<PersonalCenter> {
   @override
-  void initState() {}
+  void initState() {
+    var name = HomeGlobal.getUsername();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +28,16 @@ class PersonalCenterState extends State<PersonalCenter> {
             Row(
               children: [
                 const Text("账号"),
-                Text(widget.vm.loginInfo.name),
+                Text(HomeGlobal.getUsername()),
               ],
             ),
             Row(
               children: [
                 const Text("密码"),
-                Text(widget.vm.loginInfo.password),
+                Text(HomeGlobal.loginInfo!.password),
               ],
             ),
-            const Text("账号密码"),
+            // const Text("账号密码"),
             TextButton(
                 onPressed: () {
                   widget.vm
