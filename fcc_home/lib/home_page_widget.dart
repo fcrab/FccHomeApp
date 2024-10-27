@@ -61,9 +61,11 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // (_pageWidget[0] as MinePageWidget).vm.refreshAndCheckFiles();
 
         //upload files
-        await (_pageWidget[0] as MinePageWidget).vm.syncFiles();
-        _progressDialog.hide();
-
+        await (_pageWidget[0] as MinePageWidget).vm.syncFiles().then((value) {
+          print("truely upload successful");
+          _progressDialog.hide();
+        });
+        print("after upload");
         // _incrementCounter();
       },
       tooltip: 'syncfiles',

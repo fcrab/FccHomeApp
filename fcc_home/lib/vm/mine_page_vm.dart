@@ -188,6 +188,23 @@ class MinePageVM {
     }
   }
 
+  Future<bool> truelyUpaloadAnFile(FileInfoRepo unit) async {
+    print("uploadfile ${unit.md5}");
+    var uploadResult = await client.uploadLocalFile(
+        unit.name, unit.path, HomeGlobal.token, unit.md5);
+    print("uploadresult: $uploadResult");
+    //判断是否上传成功
+    if (true) {
+      mineEntries.localEntries
+          .firstWhere((element) => element.uri == unit.path)
+          .syncState = true;
+      // entity.syncState = true;
+      // updateFiles.add(entity.toFileInfos());
+      mineEntries.justRefreshTheState();
+      return true;
+    }
+  }
+
   //upload files
   Future<void> uploadFilesByIsolate(List<SyncInfo> uploadList) async {
     var dbHelper = LocalDBHelper();
@@ -205,23 +222,19 @@ class MinePageVM {
       print("check files result: $result");
       //todo bug here md5 == null
       // List<FileInfoRepo> updateFiles = [];
-      localUploadInfos
-          .where((element) => unSyncMd5s.contains(element.md5))
-          .forEach((unit) async {
-        print("uploadfile ${unit.md5}");
-        var uploadResult = await client.uploadLocalFile(
-            unit.name, unit.path, HomeGlobal.token, unit.md5);
-        print("uploadresult: $uploadResult");
-        //判断是否上传成功
-        if (true) {
-          mineEntries.localEntries
-              .firstWhere((element) => element.uri == unit.path)
-              .syncState = true;
-          // entity.syncState = true;
-          // updateFiles.add(entity.toFileInfos());
-          mineEntries.justRefreshTheState();
-        }
+      //这种做法并没有办法真正await整个函数
+      // localUploadInfos
+      //     .where((element) => unSyncMd5s.contains(element.md5))
+      //     .forEach((unit) async => await
+      //       truelyUpaloadAnFile(unit)
+      // );
+      //需要使用future.foreach或future.await
+      Iterable<FileInfoRepo> list =
+          localUploadInfos.where((element) => unSyncMd5s.contains(element.md5));
+      await Future.forEach(list, (element) async {
+        await truelyUpaloadAnFile(element as FileInfoRepo);
       });
+      print("wait upload into the end");
       //todo wait to fix
       // dbHelper.updateFileInfos(updateFiles);
     }
