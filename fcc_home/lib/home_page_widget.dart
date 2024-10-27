@@ -85,6 +85,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
     });
   }
 
+  void _onMenuClick(String value) {}
+
   @override
   Widget build(BuildContext context) {
     String name =
@@ -94,6 +96,19 @@ class _HomePageWidgetState extends State<HomePageWidget>
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: _onMenuClick,
+            itemBuilder: (BuildContext context) {
+              return {'切换文件夹', '全选'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ],
         // actions: [
         // CustomAction(
         //   TextButton(
