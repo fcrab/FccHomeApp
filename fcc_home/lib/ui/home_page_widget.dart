@@ -1,6 +1,6 @@
-import 'package:fcc_home/auth_page.dart';
 import 'package:fcc_home/home_global.dart';
-import 'package:fcc_home/server_page_widget.dart';
+import 'package:fcc_home/ui/auth_page.dart';
+import 'package:fcc_home/ui/server_page_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 

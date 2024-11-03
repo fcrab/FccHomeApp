@@ -1,9 +1,9 @@
-import 'package:fcc_home/personal_center.dart';
+import 'package:fcc_home/ui/home_page_widget.dart';
+import 'package:fcc_home/ui/personal_center.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'auth_page.dart';
-import 'home_page_widget.dart';
+import 'ui/auth_page.dart';
 
 void main() {
   runApp(const MyApp());
