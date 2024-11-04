@@ -42,9 +42,16 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 "getAllPics" -> {
-                    album.getPics(this) { list ->
+                    val id = call.arguments as String
+                    album.getPics(this, id) { list ->
 //                    album.getThumbs(this) { list ->
                         result.success(list)
+                    }
+                }
+
+                "getFolder" -> {
+                    album.getFolders { map ->
+                        result.success(map)
                     }
                 }
                 "delete" -> {

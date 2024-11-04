@@ -39,8 +39,13 @@ class LocalAlbum {
 
     private val localPicsList = mutableListOf<String>()
 
+    private val folderMap = mutableListOf<MutableMap<String, Any>>()
 
-    fun getPics(context: Context, callback: (list: List<String>) -> Unit) {
+    fun getFolders(callback: (MutableList<MutableMap<String, Any>>) -> Unit) {
+        callback(folderMap)
+    }
+
+    fun getPics(context: Context, queryBucketId: String, callback: (list: List<String>) -> Unit) {
         val thumbDir = context.getExternalFilesDir(null)!!.path + "/" + "thumb"
         Log.d("localAlbum", "thumb dir: $thumbDir")
         val originPath = Environment.getExternalStorageDirectory()
@@ -55,7 +60,7 @@ class LocalAlbum {
             sortOrder
         )
 
-        query?.use {
+        query?.use { it ->
             val idColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val nameColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
             val dateColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
@@ -84,12 +89,43 @@ class LocalAlbum {
                 valueMap["uri"] = uri.path ?: ""
                 valueMap["data"] = it.getString(dataColumn)
 
-//                Log.d("MainAct", infos)
-                val fullPath = "${originPath}/${systemPath}"
-                if (valueMap["data"]!!.contains(fullPath)) {
+                //统计图片目录
+                val bucket = folderMap.find { item -> item["name"] == bucketName }
 
+                if (bucket != null) {
+                    bucket["count"] = bucket["count"] as Int + 1
+                } else {
+                    val newBucket = mutableMapOf<String, Any>()
+                    newBucket["name"] = bucketName
+                    newBucket["id"] = bucketId.toString()
+                    newBucket["count"] = 1
+                    folderMap.add(newBucket)
+                }
+
+                var inList = false
+                var fullPath = "$originPath"
+                if (queryBucketId.isEmpty()) {
+                    val dcimPath = "${originPath}/${systemPath}/Camera"
+//                    if (valueMap["data"]!!.contains(dcimPath)) {
+                    if (valueMap["data"]!!.contains(dcimPath) && valueMap["bucketName"] == "Camera") {
+                        inList = true
+                    }
+                } else {
+                    fullPath = ""
+                    if (valueMap["bucketId"] == queryBucketId) {
+                        inList = true
+                    }
+                }
+
+//                Log.d("MainAct", infos)
+//                val fullPath = "${originPath}/${systemPath}"
+//                if (valueMap["data"]!!.contains(fullPath)) {
+                if (inList) {
+
+//                    val relativePath = valueMap["data"]!!.substring()
                     val relativePath = valueMap["data"]!!.split(fullPath)
                     val thumbPath = thumbDir + relativePath[1]
+                    Log.d("LocalAlbum", "path: $thumbPath")
                     if (isThumbExist(thumbPath)) {
 //                        Log.d("localAlbum", "thumb exist")
                         valueMap["thumb"] = thumbPath

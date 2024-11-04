@@ -4,6 +4,7 @@ import 'package:fcc_home/ui/server_page_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
+import 'folder_select_page.dart';
 import 'mine_page_widget.dart';
 
 class HomePageWidget extends StatefulWidget {
@@ -85,7 +86,16 @@ class _HomePageWidgetState extends State<HomePageWidget>
     });
   }
 
-  void _onMenuClick(String value) {}
+  Future<void> _onMenuClick(String value) async {
+    if (value == "切换文件夹") {
+      String result = await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => FolderSelectPage()));
+      if (!context.mounted) return;
+
+      print("select result is $result");
+      (_pageWidget[0] as MinePageWidget).vm.initData();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

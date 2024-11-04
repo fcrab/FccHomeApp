@@ -44,14 +44,14 @@ class MinePageVM {
 
   var client = NetClient();
 
-  Future<void> initData() async {
-    await initDatas();
+  Future<void> initData([String bucketId = ""]) async {
+    await initDatas(bucketId);
 
     checkFilesSyncState();
   }
 
   //获取并刷新数据(默认已同步)
-  Future<void> initDatas() async {
+  Future<void> initDatas(String bucketId) async {
     List<SyncInfo> syncFiles = [];
 
     List<Map<String, dynamic>> datas = [];
@@ -61,7 +61,8 @@ class MinePageVM {
     print(result);
     if (result == true) {
       print("next step");
-      dynamic pics = await HomeGlobal.platform.invokeListMethod("getAllPics");
+      dynamic pics =
+          await HomeGlobal.platform.invokeListMethod("getAllPics", bucketId);
       // print(pics);
       List<String> picsPath = [];
       for (String pic in pics) {
