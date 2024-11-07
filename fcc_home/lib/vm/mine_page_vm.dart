@@ -77,11 +77,13 @@ class MinePageVM {
             picsMap['thumb'].toString().isNotEmpty) {
           info = SyncInfo(
               name: picsMap['name'],
+              bucket: picsMap['bucketName'] + picsMap['bucketId'],
               uri: picsMap['data'],
               thumb: picsMap['thumb']);
         } else {
           info = SyncInfo(
               name: picsMap['name'],
+              bucket: picsMap['bucketName'] + picsMap['bucketId'],
               uri: picsMap['data'],
               thumb: picsMap['data']);
         }
@@ -161,6 +163,7 @@ class MinePageVM {
             'path': element.uri,
             'type': element.uri.substring(element.uri.lastIndexOf('.') + 1),
             'md5': element.md5,
+            'bucket': element.bucket,
             'length': 0,
             'sync': false
           }));
@@ -190,9 +193,9 @@ class MinePageVM {
   }
 
   Future<bool> truelyUpaloadAnFile(FileInfoRepo unit) async {
-    print("uploadfile ${unit.md5}");
+    print("uploadfile ${unit.md5} ${unit.bucket}");
     var uploadResult = await client.uploadLocalFile(
-        unit.name, unit.path, HomeGlobal.token, unit.md5);
+        unit.name, unit.bucket, unit.path, HomeGlobal.token, unit.md5);
     print("uploadresult: $uploadResult");
     //判断是否上传成功
     if (true) {
@@ -331,6 +334,7 @@ class MineVirualVM extends DetailVirtualVM {
 
 class SyncInfo {
   String name;
+  String bucket;
   String uri;
   String thumb;
   String? md5;
@@ -343,10 +347,15 @@ class SyncInfo {
       'path': uri,
       'type': uri.substring(uri.lastIndexOf('.') + 1),
       'md5': md5,
+      'bucket': bucket,
       'length': 0,
       'sync': syncState
     });
   }
 
-  SyncInfo({required this.name, required this.uri, required this.thumb});
+  SyncInfo(
+      {required this.name,
+      required this.bucket,
+      required this.uri,
+      required this.thumb});
 }

@@ -93,7 +93,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
       if (!context.mounted) return;
 
       print("select result is $result");
-      (_pageWidget[0] as MinePageWidget).vm.initData();
+      (_pageWidget[0] as MinePageWidget).vm.initData(result);
     }
   }
 

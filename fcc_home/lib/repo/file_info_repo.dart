@@ -5,6 +5,7 @@ class FileInfoRepo {
   final String path;
   final String type;
   final String md5;
+  final String bucket;
   final int length;
   final bool sync;
 
@@ -15,6 +16,7 @@ class FileInfoRepo {
       required this.path,
       required this.type,
       required this.md5,
+      required this.bucket,
       required this.length,
       required this.sync});
 
@@ -24,6 +26,7 @@ class FileInfoRepo {
         path = file["path"],
         type = file["type"],
         md5 = file["md5"],
+        bucket = file["bucket"],
         length = file["length"],
         sync = file["sync"] == 0 ? false : true;
 
@@ -34,6 +37,7 @@ class FileInfoRepo {
       'path': path,
       'type': type,
       'md5': md5,
+      'bucket': bucket,
       'length': length,
       'sync': sync
     };
@@ -41,6 +45,6 @@ class FileInfoRepo {
 
   @override
   String toString() {
-    return 'FileInfoRepo{name:$name,path:$path,type:$type,md5:$md5,length:$length,sync:$sync}';
+    return 'FileInfoRepo{name:$name,path:$path,type:$type,md5:$md5,bucket:$bucket,length:$length,sync:$sync}';
   }
 }

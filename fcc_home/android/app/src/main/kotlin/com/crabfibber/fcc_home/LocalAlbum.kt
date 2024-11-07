@@ -46,11 +46,14 @@ class LocalAlbum {
     }
 
     fun getPics(context: Context, queryBucketId: String, callback: (list: List<String>) -> Unit) {
+        localPicsList.clear()
         val thumbDir = context.getExternalFilesDir(null)!!.path + "/" + "thumb"
         Log.d("localAlbum", "thumb dir: $thumbDir")
         val originPath = Environment.getExternalStorageDirectory()
         val systemPath = Environment.DIRECTORY_DCIM
 
+        Log.d("localAlbum", "originPath ${originPath}")
+        
         val gson = Gson()
         val query = context.applicationContext.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -111,7 +114,7 @@ class LocalAlbum {
                         inList = true
                     }
                 } else {
-                    fullPath = ""
+//                    fullPath = ""
                     if (valueMap["bucketId"] == queryBucketId) {
                         inList = true
                     }
@@ -125,7 +128,7 @@ class LocalAlbum {
 //                    val relativePath = valueMap["data"]!!.substring()
                     val relativePath = valueMap["data"]!!.split(fullPath)
                     val thumbPath = thumbDir + relativePath[1]
-                    Log.d("LocalAlbum", "path: $thumbPath")
+                    Log.d("LocalAlbum", "filePath: ${valueMap["data"]} path: $thumbPath")
                     if (isThumbExist(thumbPath)) {
 //                        Log.d("localAlbum", "thumb exist")
                         valueMap["thumb"] = thumbPath

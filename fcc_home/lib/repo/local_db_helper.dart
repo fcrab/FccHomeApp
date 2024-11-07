@@ -12,7 +12,7 @@ class LocalDBHelper {
         join(await getDatabasesPath(), 'local_album_database.db'),
         onCreate: (db, version) {
       return db.execute(
-          'CREATE TABLE $fileTable(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,path TEXT,type TEXT,md5 TEXT,length INTEGER,sync BOOLEAN)');
+          'CREATE TABLE $fileTable(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,path TEXT,type TEXT,md5 TEXT,bucket TEXT,length INTEGER,sync BOOLEAN)');
     }, version: 2);
   }
 

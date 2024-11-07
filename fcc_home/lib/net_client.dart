@@ -133,13 +133,15 @@ class NetClient {
   }
 
   //上传图片
-  Future<String?> uploadLocalFile(String name,String path,String token,String md5) async{
+  Future<String?> uploadLocalFile(
+      String name, String bucket, String path, String token, String md5) async {
     String uploadUrl = "files/upload";
     try{
       FormData data = FormData.fromMap({
         "img":
         await MultipartFile.fromFile(path,filename: name),
         "name":name,
+        "bucket": bucket,
         "user_id":token,
         "md5":md5
       });
