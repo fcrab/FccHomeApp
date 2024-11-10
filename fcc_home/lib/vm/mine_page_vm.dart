@@ -44,6 +44,32 @@ class MinePageVM {
 
   var client = NetClient();
 
+  Future<void> selectAll() async {
+    mineEntries.selectAllToSyncFiles();
+  }
+
+  void setMode() {
+    mineEntries.setMode();
+  }
+
+  bool getDelMode() {
+    return mineEntries.delMode;
+  }
+
+  Future<void> deleteData() async {
+    List<String> deleteFiles = [];
+    for (var index = 0; index < mineEntries.syncMarks.length; index++) {
+      if (mineEntries.syncMarks[index]) {
+        print("del file ${mineEntries.localEntries[index].uri}");
+        deleteFiles.add(mineEntries.localEntries[index].uri);
+      }
+    }
+    entries.removeWhere((element) => deleteFiles.contains(element));
+    mineEntries.removeFiles(deleteFiles);
+    dynamic result =
+        await HomeGlobal.platform.invokeMethod("deleteFiles", deleteFiles);
+  }
+
   Future<void> initData([String bucketId = ""]) async {
     await initDatas(bucketId);
 
@@ -280,6 +306,30 @@ class MineFiles with ChangeNotifier {
 
   //marks waiting for upload
   List<bool> syncMarks = [];
+
+  bool delMode = false;
+
+  void setMode() {
+    delMode = !delMode;
+    syncMarks = List.filled(localEntries.length, false);
+    notifyListeners();
+  }
+
+  void selectAllToSyncFiles() {
+    syncMarks = List.filled(localEntries.length, false);
+    localEntries.asMap().forEach((index, value) {
+      if (value.syncState == false) {
+        syncMarks[index] = true;
+      }
+    });
+    notifyListeners();
+  }
+
+  void removeFiles(List<String> paths) {
+    localEntries.removeWhere((element) => paths.contains(element.uri));
+    syncMarks = List.filled(localEntries.length, false);
+    notifyListeners();
+  }
 
   void refreshFiles(List<SyncInfo> newFiles) {
     localEntries.clear();

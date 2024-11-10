@@ -26,6 +26,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   FloatingActionButton? syncBtn;
 
+  late List<PopupMenuEntry<String>> _menuList;
+
   void setTitle(String barTitle) {
     setState(() {
       widget.title = barTitle;
@@ -41,37 +43,70 @@ class _HomePageWidgetState extends State<HomePageWidget>
     _progressDialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
 
-    syncBtn = genSyncBtn();
-
     _pageWidget = <Widget>[
       MinePageWidget(homeAction: setTitle),
       ServerPageWidget()
     ];
+
+    syncBtn = genSyncBtn();
+    _menuList = genMenuItemList('default');
+  }
+
+  List<PopupMenuEntry<String>> genMenuItemList(String mode) {
+    switch (mode) {
+      case 'default':
+        return {'切换文件夹', '全选', '删除'}.map((String choice) {
+          return PopupMenuItem<String>(
+            value: choice,
+            child: Text(choice),
+          );
+        }).toList();
+      case 'explorer':
+        return {'全选', '浏览'}.map((String choice) {
+          return PopupMenuItem<String>(
+            value: choice,
+            child: Text(choice),
+          );
+        }).toList();
+      default:
+        return [];
+    }
   }
 
   FloatingActionButton genSyncBtn() {
-    return FloatingActionButton(
-      onPressed: () async {
-        print("click upload");
-        _progressDialog.show(message: "正在同步文件");
+    if ((_pageWidget[0] as MinePageWidget).vm.getDelMode()) {
+      return FloatingActionButton(
+          onPressed: () async {
+            _progressDialog.show(message: '正在删除文件');
+            await (_pageWidget[0] as MinePageWidget).vm.deleteData();
+            _progressDialog.hide();
+          },
+          tooltip: 'delfiles',
+          child: const Icon(Icons.delete));
+    } else {
+      return FloatingActionButton(
+        onPressed: () async {
+          print("click upload");
+          _progressDialog.show(message: "正在同步文件");
 
-        //upload file test
-        // (_pageWidget[0] as MinePageWidget).vm.checkFilesByIsolate();
+          //upload file test
+          // (_pageWidget[0] as MinePageWidget).vm.checkFilesByIsolate();
 
-        //check file sync state
-        // (_pageWidget[0] as MinePageWidget).vm.refreshAndCheckFiles();
+          //check file sync state
+          // (_pageWidget[0] as MinePageWidget).vm.refreshAndCheckFiles();
 
-        //upload files
-        await (_pageWidget[0] as MinePageWidget).vm.syncFiles().then((value) {
-          print("truely upload successful");
-          _progressDialog.hide();
-        });
-        print("after upload");
-        // _incrementCounter();
-      },
-      tooltip: 'syncfiles',
-      child: const Icon(Icons.sync),
-    );
+          //upload files
+          await (_pageWidget[0] as MinePageWidget).vm.syncFiles().then((value) {
+            print("truely upload successful");
+            _progressDialog.hide();
+          });
+          print("after upload");
+          // _incrementCounter();
+        },
+        tooltip: 'syncfiles',
+        child: const Icon(Icons.sync),
+      );
+    }
   }
 
   void _onTapItem(int index) {
@@ -80,8 +115,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
       //todo 可以在这里控制切换
       if (_selectedIndex == 0) {
         syncBtn = genSyncBtn();
+        _menuList = genMenuItemList('default');
       } else {
         syncBtn = null;
+        _menuList = genMenuItemList('');
       }
     });
   }
@@ -94,6 +131,29 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
       print("select result is $result");
       (_pageWidget[0] as MinePageWidget).vm.initData(result);
+    } else if (value == '删除') {
+      // (_pageWidget[0] as MinePageWidget).vm.deleteData();
+      (_pageWidget[0] as MinePageWidget).vm.setMode();
+      setState(() {
+        if (_selectedIndex == 0) {
+          syncBtn = genSyncBtn();
+          _menuList = genMenuItemList('explorer');
+        } else {
+          syncBtn = null;
+        }
+      });
+    } else if (value == '浏览') {
+      (_pageWidget[0] as MinePageWidget).vm.setMode();
+      setState(() {
+        if (_selectedIndex == 0) {
+          syncBtn = genSyncBtn();
+          _menuList = genMenuItemList('default');
+        } else {
+          syncBtn = null;
+        }
+      });
+    } else if (value == '全选') {
+      (_pageWidget[0] as MinePageWidget).vm.selectAll();
     }
   }
 
@@ -110,12 +170,13 @@ class _HomePageWidgetState extends State<HomePageWidget>
           PopupMenuButton<String>(
             onSelected: _onMenuClick,
             itemBuilder: (BuildContext context) {
-              return {'切换文件夹', '全选'}.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
+              return _menuList;
+              // return {'切换文件夹', '全选','删除'}.map((String choice) {
+              //   return PopupMenuItem<String>(
+              //     value: choice,
+              //     child: Text(choice),
+              //   );
+              // }).toList();
             },
           ),
         ],

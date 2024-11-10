@@ -54,6 +54,12 @@ class MainActivity : FlutterActivity() {
                         result.success(map)
                     }
                 }
+                "deleteFiles" -> {
+                    val uri: List<String> = call.arguments as List<String>
+                    album.deleteFiles(this, uri)
+                    result.success(true)
+                }
+
                 "delete" -> {
                     val uri = call.arguments
                     Log.d(TAG,"delete uri :$uri")

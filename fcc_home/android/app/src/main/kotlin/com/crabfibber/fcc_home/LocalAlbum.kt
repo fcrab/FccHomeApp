@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaScannerConnection
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Thumbnails
@@ -45,8 +46,24 @@ class LocalAlbum {
         callback(folderMap)
     }
 
+    fun deleteFiles(context: Context, files: List<String>) {
+        files.forEach { path ->
+            val file = File(path)
+            if (file.exists()) {
+                file.delete()
+            }
+            //update files db
+//            val where = "${MediaStore.Images.Media.DATA} like $path%"
+//            context.contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+
+        }
+        MediaScannerConnection.scanFile(context, files.toTypedArray(), null, null)
+
+    }
+
     fun getPics(context: Context, queryBucketId: String, callback: (list: List<String>) -> Unit) {
         localPicsList.clear()
+        folderMap.clear()
         val thumbDir = context.getExternalFilesDir(null)!!.path + "/" + "thumb"
         Log.d("localAlbum", "thumb dir: $thumbDir")
         val originPath = Environment.getExternalStorageDirectory()
@@ -106,7 +123,7 @@ class LocalAlbum {
                 }
 
                 var inList = false
-                var fullPath = "$originPath"
+                val fullPath = "$originPath"
                 if (queryBucketId.isEmpty()) {
                     val dcimPath = "${originPath}/${systemPath}/Camera"
 //                    if (valueMap["data"]!!.contains(dcimPath)) {

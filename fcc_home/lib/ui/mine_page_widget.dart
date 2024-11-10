@@ -110,22 +110,32 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                         filterQuality: FilterQuality.low,
                       ),
                       Positioned(
-                        right: 10,
-                        bottom: 10,
-                        child: Visibility(
-                            visible: !info.localEntries[index].syncState,
-                            child: Checkbox(
-                              checkColor: Colors.white,
-                              value: info.syncMarks[index],
-                              onChanged: (bool? value) {
-                                // setState(() {
-                                print("item $index change to value: $value");
-                                info.syncMarks[index] = value!;
-                                info.notifyListeners();
-                                // });
-                              },
-                            )),
-                      )
+                          right: 10,
+                          bottom: 10,
+                          child: Column(
+                            children: [
+                              Visibility(
+                                  visible: info.localEntries[index].syncState,
+                                  child: const Icon(Icons.cloud_sync_sharp,
+                                      color: Colors.white)),
+                              Visibility(
+                                  visible:
+                                      !info.localEntries[index].syncState ||
+                                          info.delMode,
+                                  child: Checkbox(
+                                    checkColor: Colors.white,
+                                    value: info.syncMarks[index],
+                                    onChanged: (bool? value) {
+                                      // setState(() {
+                                      print(
+                                          "item $index change to value: $value");
+                                      info.syncMarks[index] = value!;
+                                      info.notifyListeners();
+                                      // });
+                                    },
+                                  )),
+                            ],
+                          ))
                     ],
                   ),
                   onTap: () {

@@ -32,6 +32,9 @@ class AuthVM {
       var info = LoginInfo.cache(id: HomeGlobal.token);
       HomeGlobal.saveAccess(info);
       await HomeGlobal.getAccessInfo();
+      if (HomeGlobal.loginInfo != null) {
+        loginInfo.refreshData(HomeGlobal.loginInfo!);
+      }
       // loginInfo.refreshData(LoginInfo.cache(id: HomeGlobal.token));
     }
   }
