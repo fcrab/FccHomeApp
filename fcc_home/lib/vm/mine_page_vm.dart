@@ -224,7 +224,7 @@ class MinePageVM {
         unit.name, unit.bucket, unit.path, HomeGlobal.token, unit.md5);
     print("uploadresult: $uploadResult");
     //判断是否上传成功
-    if (true) {
+    if (uploadResult != null) {
       mineEntries.localEntries
           .firstWhere((element) => element.uri == unit.path)
           .syncState = true;
@@ -232,6 +232,8 @@ class MinePageVM {
       // updateFiles.add(entity.toFileInfos());
       mineEntries.justRefreshTheState();
       return true;
+    } else {
+      return false;
     }
   }
 
@@ -262,7 +264,11 @@ class MinePageVM {
       Iterable<FileInfoRepo> list =
           localUploadInfos.where((element) => unSyncMd5s.contains(element.md5));
       await Future.forEach(list, (element) async {
-        await truelyUpaloadAnFile(element as FileInfoRepo);
+        bool uploadResult = await truelyUpaloadAnFile(element as FileInfoRepo);
+        if (!uploadResult) {
+          print("upload ${element.path} failed , upload break");
+          return;
+        }
       });
       print("wait upload into the end");
       //todo wait to fix
