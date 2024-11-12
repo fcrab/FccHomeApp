@@ -50,7 +50,13 @@ class FolderSelectState extends State<FolderSelectPage>
                   return Container(
                       // padding: const EdgeInsets.all(4),
                       alignment: const Alignment(0, 0),
-                      color: Colors.blueGrey,
+                      // color: Colors.blueGrey,
+                      decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(color: Colors.grey, blurRadius: 5)
+                          ]),
                       child: GestureDetector(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
