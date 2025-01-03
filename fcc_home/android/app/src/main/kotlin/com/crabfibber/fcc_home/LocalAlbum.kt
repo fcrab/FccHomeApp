@@ -110,7 +110,7 @@ class LocalAlbum {
                 valueMap["data"] = it.getString(dataColumn)
 
                 //统计图片目录
-                val bucket = folderMap.find { item -> item["name"] == bucketName }
+                val bucket = folderMap.find { item -> item["id"] == bucketId.toString() }
 
                 if (bucket != null) {
                     bucket["count"] = bucket["count"] as Int + 1

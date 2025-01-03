@@ -1,6 +1,7 @@
 import 'package:fcc_home/home_global.dart';
 import 'package:fcc_home/ui/auth_page.dart';
 import 'package:fcc_home/ui/server_page_widget.dart';
+import 'package:fcc_home/util/wake_rock.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
@@ -87,6 +88,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
       return FloatingActionButton(
         onPressed: () async {
           print("click upload");
+          await enableScreen();
           _progressDialog.show(message: "正在同步文件");
 
           //upload file test
@@ -98,6 +100,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
           //upload files
           await (_pageWidget[0] as MinePageWidget).vm.syncFiles().then((value) {
             print("truely upload successful");
+            disableScreen();
             _progressDialog.hide();
           });
           print("after upload");

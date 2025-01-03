@@ -301,6 +301,10 @@ class MinePageVM {
       if (mineEntries.syncMarks[index]) {
         upload.add(mineEntries.localEntries[index]);
       }
+      if (upload.length >= 3) {
+        await uploadFilesByIsolate(upload);
+        upload.clear();
+      }
     }
     await uploadFilesByIsolate(upload);
   }

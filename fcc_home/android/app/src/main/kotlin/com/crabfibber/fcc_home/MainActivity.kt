@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Toast
 import com.google.gson.Gson
 import io.flutter.embedding.android.FlutterActivity
@@ -68,6 +69,15 @@ class MainActivity : FlutterActivity() {
                     } else {
                         result.error("-100", "", "")
                     }
+                }
+                "screenSwitch" -> {
+                    val enable = call.arguments as Boolean
+                    if (enable) {
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    } else {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
+                    result.success(true)
                 }
             }
 
