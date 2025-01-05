@@ -201,7 +201,97 @@ class WallState extends State<PhotoWall> {
     }*/
   }
 
-  Widget buildMediaList(
+  // gridview
+  Widget buildMediaList(BuildContext context, MediaInfos mediaList,
+      Widget? child) {
+    widget.index = mediaList.list.length;
+    widget.total = mediaList.getTotal();
+    print("build list :itemcount:${widget.index} total:${widget.total}");
+    return WillPopScope(
+        child: GridView.builder(
+          padding: const EdgeInsets.all(4),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, //每行显示列数2
+              crossAxisSpacing: 4.0, //列间距
+              mainAxisSpacing: 4.0, //行间距
+              childAspectRatio: 1 //item的宽高比
+          ),
+          itemCount: mediaList.list.length,
+          itemBuilder: (BuildContext context, int index) {
+            // if(index+1 == fileList.dataList.length){
+            //   widget.getNextPage(widget.currentDir);
+            // }
+            if (mediaList.list[index].isDir) {
+              return ListTile(
+                title: Container(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(mediaList.list[index].folder!.name),
+                ),
+                onTap: () {
+                  // initFileListFunc(mediaList.list[index].folder!.id);
+                  getCurrentDirs(mediaList.list[index].folder!.id);
+                },
+              );
+            } else {
+              String imgUrl;
+              if (mediaList.list[index].file!.thumb.isEmpty) {
+                imgUrl = mediaList.list[index].file!.url;
+              } else {
+                imgUrl = mediaList.list[index].file!.thumb;
+              }
+
+              return Container(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: GestureDetector(
+                    child: Image.network(imgUrl,
+                        height: 400,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.medium),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  DisplayPage.mode(
+                                      url: mediaList.fileInfos.dataList
+                                          .map((e) => e.url)
+                                          .toList(),
+                                      index: index - mediaList.getDirLength(),
+                                      mode: ImgType.NETWORK,
+                                      virtualVM: widget.getDisplayVm(
+                                          mediaList.fileInfos.dataList))))
+                          .then((value) {
+                        setState(() {});
+                      });
+
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => DisplayPage(
+                      //               url: mediaList.fileInfos.dataList
+                      //                   .map((e) => e.url)
+                      //                   .toList(),
+                      // index:
+                      //                   index - mediaList.dirInfos.dirs.length,
+                      //             )));
+                    },
+                  ));
+            }
+          },
+          controller: _scrollController,
+        ),
+        onWillPop: () async {
+          //返回刷新
+          //需要被优化
+          backToTop(widget.upperDir.pop());
+          // getDirsFunc();
+
+          return false;
+        });
+  }
+
+  //ListView
+/*  Widget buildMediaList(
       BuildContext context, MediaInfos mediaList, Widget? child) {
     widget.index = mediaList.list.length;
     widget.total = mediaList.getTotal();
@@ -280,7 +370,7 @@ class WallState extends State<PhotoWall> {
 
           return false;
         });
-  }
+  }*/
 
 /*  Widget buildList(BuildContext context, FileInfos fileList, Widget? child) {
     widget.index = fileList.dataList.length;
