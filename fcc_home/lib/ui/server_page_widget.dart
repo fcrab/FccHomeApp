@@ -248,7 +248,7 @@ class WallState extends State<PhotoWall> {
                                       url: mediaList.fileInfos.dataList
                                           .map((e) => e.url)
                                           .toList(),
-                                      index: index,
+                                      index: index - mediaList.getDirLength(),
                                       mode: ImgType.NETWORK,
                                       virtualVM: widget.getDisplayVm(
                                           mediaList.fileInfos.dataList))))

@@ -265,6 +265,10 @@ class MediaInfos with ChangeNotifier {
     ];
   }
 
+  int getDirLength() {
+    return dirInfos.dirs.length;
+  }
+
   int getTotal() {
     return dirInfos.dirs.length + fileInfos.total;
   }
