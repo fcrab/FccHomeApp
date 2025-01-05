@@ -222,15 +222,20 @@ class WallState extends State<PhotoWall> {
             //   widget.getNextPage(widget.currentDir);
             // }
             if (mediaList.list[index].isDir) {
-              return ListTile(
-                title: Container(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(mediaList.list[index].folder!.name),
+              return Card(
+                elevation: 4, //阴影
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2)), //圆角
+                child: ListTile(
+                  title: Container(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(mediaList.list[index].folder!.name),
+                  ),
+                  onTap: () {
+                    // initFileListFunc(mediaList.list[index].folder!.id);
+                    getCurrentDirs(mediaList.list[index].folder!.id);
+                  },
                 ),
-                onTap: () {
-                  // initFileListFunc(mediaList.list[index].folder!.id);
-                  getCurrentDirs(mediaList.list[index].folder!.id);
-                },
               );
             } else {
               String imgUrl;
