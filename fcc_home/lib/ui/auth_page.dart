@@ -44,13 +44,13 @@ class AuthPageState extends State<AuthPage> {
 
 class AuthPageBody extends StatefulWidget {
   // var vm = AuthVM();
-  Function login;
+  final Function login;
 
-  Function register;
+  final Function register;
 
-  Function verifyLocal;
+  final Function verifyLocal;
 
-  AuthPageBody(
+  const AuthPageBody(
       {Key? key,
       required this.login,
       required this.register,
@@ -95,6 +95,7 @@ class AuthPageBodyState extends State<AuthPageBody> {
   @override
   Widget build(BuildContext context) {
     // LoginInfo id = Provider.of<LoginInfo>(context,listen: false);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Consumer<LoginInfo>(builder: (_, info, child) {
       print("id: ${info.id} name:${info.name} password:${info.password}");
@@ -121,41 +122,74 @@ class AuthPageBodyState extends State<AuthPageBody> {
         Future.microtask(() => {});
       }
 
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('账号'),
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(left: 50, right: 50, bottom: 20),
-              child: TextField(
-                controller: authNameCtrl = TextEditingController(text: ""),
-                maxLines: 1,
+      return Container(
+        color: colorScheme.surface,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // const Text('账号'),
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(left: 50, right: 50, bottom: 20),
+                child: TextField(
+                  controller: authNameCtrl = TextEditingController(text: ""),
+                  maxLines: 1,
+                  decoration: const InputDecoration(
+                    hintText: '请输入账号',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                ),
               ),
-            ),
-            const Text('密码'),
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(left: 50, right: 50, bottom: 20),
-              child: TextField(
-                controller: authPswCtrl = TextEditingController(text: ""),
-                maxLines: 1,
+              // const Text('密码'),
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(left: 50, right: 50, bottom: 20),
+                child: TextField(
+                  controller: authPswCtrl = TextEditingController(text: ""),
+                  maxLines: 1,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    hintText: '请输入密码',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                ),
               ),
-            ),
-            TextButton(
-                onPressed: () {
-                  // widget.login(authNameCtrl.text, authPswCtrl.text);
-                  execute(widget.login, authNameCtrl.text, authPswCtrl.text);
-                },
-                child: const Text("登录")),
-            TextButton(
-                onPressed: () {
-                  // widget.register(authNameCtrl.text, authPswCtrl.text);
-                  execute(widget.register, authNameCtrl.text, authPswCtrl.text);
-                },
-                child: const Text("注册")),
-          ],
+              Container(
+                width: MediaQuery.of(context).size.width - 100,
+                height: 50,
+                margin: const EdgeInsets.symmetric(horizontal: 50),
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    onPressed: () {
+                      // widget.login(authNameCtrl.text, authPswCtrl.text);
+                      execute(
+                          widget.login, authNameCtrl.text, authPswCtrl.text);
+                    },
+                    child: const Text("登录")),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width - 100,
+                height: 50,
+                margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 5),
+                child: TextButton(
+                    onPressed: () {
+                      // widget.register(authNameCtrl.text, authPswCtrl.text);
+                      execute(
+                          widget.register, authNameCtrl.text, authPswCtrl.text);
+                    },
+                    child: const Text("注册")),
+              )
+            ],
+          ),
         ),
       );
     });
