@@ -81,6 +81,7 @@ class DisplayPageState extends State<DisplayPage> {
           type: widget.mode, url: widget.vm.urls[count]));
     }
 
+    //本地图片允许删除
     var barActions = [
       IconButton(
           onPressed: () {
@@ -91,7 +92,16 @@ class DisplayPageState extends State<DisplayPage> {
           icon: const Icon(Icons.delete_outline))
     ];
     if (widget.mode == ImgType.NETWORK) {
-      barActions = [];
+      //网络图片只能
+      barActions = [
+        IconButton(
+            onPressed: () {
+              setState(() {
+                widget.vm.share(pageIndex);
+              });
+            },
+            icon: const Icon(Icons.share))
+      ];
     }
 
     return Scaffold(

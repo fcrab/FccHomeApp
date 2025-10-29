@@ -209,6 +209,7 @@ class MinePageVM {
 
       for (var unSyncMd5 in unSyncMd5s) {
         var file = existFiles.firstWhere((element) => element.md5 == unSyncMd5);
+        print('unsync md5 $unSyncMd5 and path ${file.path}');
         var entity = mineEntries.localEntries
             .firstWhere((element) => element.uri == file.path);
         entity.syncState = false;

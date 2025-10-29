@@ -1,3 +1,4 @@
+import 'package:fcc_home/util/ImageDownloader.dart';
 import 'package:fcc_home/vm/detail_virtual_vm.dart';
 import 'package:intl/intl.dart';
 
@@ -10,9 +11,16 @@ class DisplayVM {
 
   List<String> urls = [];
 
+  var downloader = ImageDownloader();
+
   void deletePic(int index) {
     virtualVM?.removeAt(index);
     urls.removeAt(index);
+  }
+
+  void share(int index) {
+    print('share pic ${virtualVM!.getInfo(index)['name']}');
+    downloader.sharePics(urls[index], virtualVM!.getInfo(index)['name']);
   }
 
   Map<String, String> getDate(int index) {
