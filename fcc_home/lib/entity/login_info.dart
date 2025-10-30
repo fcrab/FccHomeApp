@@ -1,6 +1,3 @@
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 class LoginInfo with ChangeNotifier {
@@ -75,13 +72,22 @@ class LoginInfo with ChangeNotifier {
     notifyListeners();
   }
 
-  String toJson() {
-    return json.encode(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'password': password,
+      'salt': salt,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'status': status,
+      'lastUpdateTime': lastUpdateTime,
+    };
   }
 
   factory LoginInfo.fromJson(Map<String, dynamic> json) {
     return LoginInfo(
-        id: (json['id'] as int).toString(),
+        id: json['id'] as String,
         name: json['name'] as String,
         password: (json['password'] ?? "") as String,
         salt: json['salt'] as String,

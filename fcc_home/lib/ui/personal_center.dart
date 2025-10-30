@@ -19,6 +19,8 @@ class PersonalCenterState extends State<PersonalCenter> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
         appBar: AppBar(
           title: const Text("个人中心"),
@@ -46,7 +48,8 @@ class PersonalCenterState extends State<PersonalCenter> {
                   // widget.register(authNameCtrl.text, authPswCtrl.text);
                   // execute(widget.register, authNameCtrl.text, authPswCtrl.text);
                 },
-                child: const Text("退出登录")),
+                child:
+                    Text("退出登录", style: TextStyle(color: colorScheme.primary))),
           ]),
         ));
   }

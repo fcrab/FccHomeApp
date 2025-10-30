@@ -75,6 +75,7 @@ class DisplayPageState extends State<DisplayPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     var children = <Widget>[];
     for (int count = 0; count < widget.vm.urls.length; count++) {
       children.add(PageImgWidget(
@@ -89,7 +90,7 @@ class DisplayPageState extends State<DisplayPage> {
               widget.vm.deletePic(pageIndex);
             });
           },
-          icon: const Icon(Icons.delete_outline))
+          icon: Icon(Icons.delete_outline, color: colorScheme.onSurface))
     ];
     if (widget.mode == ImgType.NETWORK) {
       //网络图片只能
@@ -107,7 +108,10 @@ class DisplayPageState extends State<DisplayPage> {
     return Scaffold(
       appBar: AppBar(
         title: Column(
-          children: [Text(barTitle), Text(barSubTitle)],
+          children: [
+            Text(barTitle, style: TextStyle(color: colorScheme.onPrimary)),
+            Text(barSubTitle, style: TextStyle(color: colorScheme.onPrimary)),
+          ],
         ),
         actions: barActions,
       ),

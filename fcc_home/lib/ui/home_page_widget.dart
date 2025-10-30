@@ -86,6 +86,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
           child: const Icon(Icons.delete));
     } else {
       return FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () async {
           print("click upload");
           await enableScreen();
@@ -107,7 +108,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
           // _incrementCounter();
         },
         tooltip: 'syncfiles',
-        child: const Icon(Icons.sync),
+        child: const Icon(
+          Icons.sync,
+          color: Colors.white,
+        ),
       );
     }
   }
@@ -162,6 +166,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     String name =
         HomeGlobal.loginInfo != null ? HomeGlobal.loginInfo!.name : "";
     return Scaffold(
@@ -204,8 +209,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFFFF8F00)),
-              child: Text(name),
+              decoration: BoxDecoration(color: colorScheme.primary),
+              child: Text(name, style: TextStyle(color: colorScheme.onPrimary)),
             ),
             ListTile(
               title: const Text('个人中心'),
@@ -242,7 +247,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
           BottomNavigationBarItem(icon: Icon(Icons.cloud), label: '云')
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.tertiary,
         onTap: _onTapItem,
       ),
     );

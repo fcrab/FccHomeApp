@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fcc_home/vm/media_server_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -204,6 +205,7 @@ class WallState extends State<PhotoWall> {
   // gridview
   Widget buildMediaList(BuildContext context, MediaInfos mediaList,
       Widget? child) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     widget.index = mediaList.list.length;
     widget.total = mediaList.getTotal();
     print("build list :itemcount:${widget.index} total:${widget.total}");
@@ -229,7 +231,8 @@ class WallState extends State<PhotoWall> {
                 child: ListTile(
                   title: Container(
                     padding: const EdgeInsets.only(top: 4),
-                    child: Text(mediaList.list[index].folder!.name),
+                    child: Text(mediaList.list[index].folder!.name,
+                        style: TextStyle(color: colorScheme.onSurface)),
                   ),
                   onTap: () {
                     // initFileListFunc(mediaList.list[index].folder!.id);
@@ -248,10 +251,17 @@ class WallState extends State<PhotoWall> {
               return Container(
                   padding: const EdgeInsets.only(top: 4),
                   child: GestureDetector(
-                    child: Image.network(imgUrl,
+                    child: CachedNetworkImage(
+                        imageUrl: imgUrl,
                         height: 400,
                         fit: BoxFit.cover,
-                        filterQuality: FilterQuality.medium),
+                        filterQuality: FilterQuality.medium,
+                        placeholder: (context, url) => Container(
+                              color: Colors.grey[300],
+                              height: 400,
+                            ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error)),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -331,10 +341,17 @@ class WallState extends State<PhotoWall> {
               return Container(
                   padding: const EdgeInsets.only(top: 4),
                   child: GestureDetector(
-                    child: Image.network(imgUrl,
+                    child: CachedNetworkImage(
+                        imageUrl: imgUrl,
                         height: 400,
                         fit: BoxFit.cover,
-                        filterQuality: FilterQuality.medium),
+                        filterQuality: FilterQuality.medium,
+                        placeholder: (context, url) => Container(
+                              color: Colors.grey[300],
+                              height: 400,
+                            ),
+                        errorWidget: (context, url, error) => 
+                            const Icon(Icons.error)),
                     onTap: () {
                       Navigator.push(
                           context,
