@@ -1,5 +1,6 @@
 import 'package:fcc_home/ui/home_page_widget.dart';
 import 'package:fcc_home/ui/personal_center.dart';
+import 'package:fcc_home/util/AppColors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +22,8 @@ class MyApp extends StatelessWidget {
         secondary: const Color(0xFF70B2B2),
         tertiary: const Color(0xFF9ECFD4),
         surface: const Color(0xFFE5E9C5));
+
+    AppColors.init(colorScheme);
 
     return MaterialApp(
       title: 'Lin',

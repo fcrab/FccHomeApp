@@ -5,6 +5,7 @@ import 'package:fcc_home/util/wake_rock.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
+import '../util/AppColors.dart';
 import 'folder_select_page.dart';
 import 'mine_page_widget.dart';
 
@@ -77,16 +78,20 @@ class _HomePageWidgetState extends State<HomePageWidget>
   FloatingActionButton genSyncBtn() {
     if ((_pageWidget[0] as MinePageWidget).vm.getDelMode()) {
       return FloatingActionButton(
+          backgroundColor: AppColors.primaryColor,
           onPressed: () async {
             _progressDialog.show(message: '正在删除文件');
             await (_pageWidget[0] as MinePageWidget).vm.deleteData();
             _progressDialog.hide();
           },
           tooltip: 'delfiles',
-          child: const Icon(Icons.delete));
+          child: const Icon(
+            Icons.delete,
+            color: Colors.white,
+          ));
     } else {
       return FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: AppColors.primaryColor,
         onPressed: () async {
           print("click upload");
           await enableScreen();
