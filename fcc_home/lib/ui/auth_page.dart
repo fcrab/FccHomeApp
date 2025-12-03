@@ -1,4 +1,5 @@
 import 'package:fcc_home/entity/login_info.dart';
+import 'package:fcc_home/entity/auth_purpose.dart';
 import 'package:fcc_home/vm/auth_vm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +17,11 @@ import 'home_page_widget.dart';
 
 class AuthPage extends StatefulWidget {
   var vm = AuthVM();
+  final AuthPurpose purpose;
 
-  AuthPage({Key? key}) : super(key: key);
+  AuthPage({Key? key, this.purpose = AuthPurpose.firstLaunch}) : super(key: key){
+    vm.purpose = purpose;
+  }
 
   @override
   State createState() {
@@ -36,7 +40,8 @@ class AuthPageState extends State<AuthPage> {
             login: widget.vm.sendLogin,
             // login: widget.vm.sendTest,
             register: widget.vm.sendRegister,
-            verifyLocal: widget.vm.verifyLocal),
+            verifyLocal: widget.vm.verifyLocal,
+            purpose: widget.purpose),
       ),
     );
   }
@@ -49,12 +54,15 @@ class AuthPageBody extends StatefulWidget {
   final Function register;
 
   final Function verifyLocal;
+  
+  final AuthPurpose purpose;
 
   const AuthPageBody(
       {Key? key,
       required this.login,
       required this.register,
-      required this.verifyLocal})
+      required this.verifyLocal,
+      required this.purpose})
       : super(key: key);
 
   @override

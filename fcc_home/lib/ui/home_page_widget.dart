@@ -5,6 +5,7 @@ import 'package:fcc_home/util/wake_rock.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
+import '../entity/auth_purpose.dart';
 import '../util/AppColors.dart';
 import 'folder_select_page.dart';
 import 'mine_page_widget.dart';
@@ -230,7 +231,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
                 // Navigator.pushNamed(context, "/");
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => AuthPage()),
+                    MaterialPageRoute(builder: (context) => AuthPage(purpose: AuthPurpose.logout,)),
                     (route) => false);
               },
             )

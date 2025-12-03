@@ -4,6 +4,7 @@ import 'package:fcc_home/entity/login_info.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../entity/auth_purpose.dart';
 import '../home_global.dart';
 import '../net_client.dart';
 
@@ -13,6 +14,7 @@ class AuthVM {
   // LoginInfo get loginInfo {
   //   return _loginInfo;
   // }
+  var purpose = AuthPurpose.firstLaunch;
 
   var client = NetClient();
 
@@ -39,13 +41,15 @@ class AuthVM {
       // loginInfo.refreshData(LoginInfo.cache(id: HomeGlobal.token));
     } else {
       //直接进入
-      final id = const Uuid().v4();
-      var info = LoginInfo.cache(id: id);
-      info.name = '游客';
-      info.status = 0;
-      HomeGlobal.saveAccessInfo(json.encode(info.toJson()));
-      HomeGlobal.saveAccessToken(info.id);
-      loginInfo.refreshData(info);
+      if(purpose == AuthPurpose.firstLaunch){
+        final id = const Uuid().v4();
+        var info = LoginInfo.cache(id: id);
+        info.name = '游客';
+        info.status = 0;
+        HomeGlobal.saveAccessInfo(json.encode(info.toJson()));
+        HomeGlobal.saveAccessToken(info.id);
+        loginInfo.refreshData(info);
+      }
     }
   }
 

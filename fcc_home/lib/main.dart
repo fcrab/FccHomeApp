@@ -1,3 +1,4 @@
+import 'package:fcc_home/entity/auth_purpose.dart';
 import 'package:fcc_home/ui/home_page_widget.dart';
 import 'package:fcc_home/ui/personal_center.dart';
 import 'package:fcc_home/util/AppColors.dart';
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
         // "display_page":(context)=> DisplayPage(),
         // "auth": (context) => AuthPage()
         "personal_page": (context) => PersonalCenter(),
-        "/": (context) => AuthPage()
+        "/": (context) => AuthPage(purpose: AuthPurpose.firstLaunch,)
       },
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       initialRoute: "/",
