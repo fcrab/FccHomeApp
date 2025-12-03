@@ -108,16 +108,18 @@ class AuthPageBodyState extends State<AuthPageBody> {
     return Consumer<LoginInfo>(builder: (_, info, child) {
       print("id: ${info.id} name:${info.name} password:${info.password}");
 
-      if (info.id != "") {
+      if (info.id != "" &&
+          (info.status != 0 || widget.purpose == AuthPurpose.firstLaunch)) {
         print("id has been refresh");
         //需要在build后再执行
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           print("call after state build");
-          Navigator.push(
+          Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
                   builder: (context) => HomePageWidget(
-                      title: 'Lin云相册', platform: defaultTargetPlatform)));
+                      title: 'Lin云相册', platform: defaultTargetPlatform)),
+              (route) => false);
         });
 
         //another way

@@ -119,8 +119,18 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                                   child: const Icon(Icons.cloud_sync_sharp,
                                       color: Colors.white)),
                               Visibility(
+                                  visible: info.localEntries[index].isUploading,
+                                  child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)
+                                  )),
+                              Visibility(
+                                  visible: info.localEntries[index].isError,
+                                  child: const Icon(Icons.error,
+                                      color: Colors.red)),
+                              Visibility(
                                   visible:
-                                      !info.localEntries[index].syncState ||
+                                      (!info.localEntries[index].syncState && !info.localEntries[index].isUploading) ||
                                           info.delMode,
                                   child: Checkbox(
                                     checkColor: Colors.white,
@@ -139,6 +149,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
                     ],
                   ),
                   onTap: () {
+                    if (info.localEntries[index].isUploading) return;
                     Navigator.push(
                         context,
                         MaterialPageRoute(

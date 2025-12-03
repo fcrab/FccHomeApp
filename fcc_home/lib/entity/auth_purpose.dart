@@ -5,4 +5,7 @@ enum AuthPurpose {
 
   /// 从其他页面退出登录后跳转
   logout,
+
+  /// 游客模式点击登录
+  reLogin,
 }

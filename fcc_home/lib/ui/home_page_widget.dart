@@ -1,6 +1,7 @@
 import 'package:fcc_home/home_global.dart';
 import 'package:fcc_home/ui/auth_page.dart';
 import 'package:fcc_home/ui/server_page_widget.dart';
+import 'package:fcc_home/ui/upload_queue_page.dart';
 import 'package:fcc_home/util/wake_rock.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
@@ -218,23 +219,49 @@ class _HomePageWidgetState extends State<HomePageWidget>
               decoration: BoxDecoration(color: colorScheme.primary),
               child: Text(name, style: TextStyle(color: colorScheme.onPrimary)),
             ),
-            ListTile(
-              title: const Text('个人中心'),
-              onTap: () {
-                Navigator.pushNamed(context, "personal_page");
-              },
-            ),
-            ListTile(
-              title: const Text('退出登录'),
-              onTap: () {
-                HomeGlobal.clean();
-                // Navigator.pushNamed(context, "/");
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => AuthPage(purpose: AuthPurpose.logout,)),
-                    (route) => false);
-              },
-            )
+            if (HomeGlobal.loginInfo != null && HomeGlobal.loginInfo!.status != 0) ...[
+              ListTile(
+                title: const Text('个人中心'),
+                onTap: () {
+                  Navigator.pushNamed(context, "personal_page");
+                },
+              ),
+              ListTile(
+                title: const Text('提交队列'),
+                leading: const Icon(Icons.cloud_upload_outlined),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const UploadQueuePage()));
+                },
+              ),
+              ListTile(
+                title: const Text('退出登录'),
+                onTap: () {
+                  HomeGlobal.clean();
+                  // Navigator.pushNamed(context, "/");
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AuthPage(
+                                purpose: AuthPurpose.logout,
+                              )),
+                      (route) => false);
+                },
+              )
+            ] else ...[
+              ListTile(
+                title: const Text('登录'),
+                leading: const Icon(Icons.login),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AuthPage(
+                                purpose: AuthPurpose.reLogin,
+                              )));
+                },
+              )
+            ]
           ],
         ),
       ),

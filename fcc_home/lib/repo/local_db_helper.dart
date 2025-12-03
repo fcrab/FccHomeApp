@@ -1,3 +1,4 @@
+import 'package:fcc_home/entity/upload_task.dart';
 import 'package:fcc_home/repo/file_info_repo.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -6,15 +7,97 @@ class LocalDBHelper {
   Database? db;
 
   final fileTable = "fileinfos";
+  final taskTable = "upload_tasks";
 
   Future<void> initDB() async {
     db ??= await openDatabase(
         join(await getDatabasesPath(), 'local_album_database.db'),
-        onCreate: (db, version) {
-      return db.execute(
+        onCreate: (db, version) async {
+      await db.execute(
           'CREATE TABLE $fileTable(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,path TEXT,type TEXT,md5 TEXT,bucket TEXT,length INTEGER,sync BOOLEAN)');
-    }, version: 2);
+      await _createTaskTable(db);
+    }, onUpgrade: (db, oldVersion, newVersion) async {
+      if (oldVersion < 3) {
+        await _createTaskTable(db);
+      }
+    }, version: 3);
   }
+
+  Future<void> _createTaskTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE $taskTable (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fileName TEXT,
+        filePath TEXT,
+        bucketName TEXT,
+        md5 TEXT,
+        fileSize INTEGER,
+        status INTEGER,
+        progress INTEGER,
+        errorMessage TEXT,
+        createTime INTEGER
+      )
+    ''');
+  }
+
+  // Upload Task Methods
+
+  Future<int> insertTask(UploadTask task) async {
+    if (db != null) {
+      return await db!.insert(taskTable, task.toMap());
+    }
+    return -1;
+  }
+
+  Future<int> updateTask(UploadTask task) async {
+    if (db != null && task.id != null) {
+      return await db!.update(taskTable, task.toMap(),
+          where: 'id = ?', whereArgs: [task.id]);
+    }
+    return -1;
+  }
+
+  Future<UploadTask?> getTaskByPath(String path) async {
+    if (db != null) {
+      List<Map<String, dynamic>> maps = await db!.query(taskTable,
+          where: 'filePath = ?', whereArgs: [path]);
+      if (maps.isNotEmpty) {
+        return UploadTask.fromMap(maps.first);
+      }
+    }
+    return null;
+  }
+
+  Future<List<UploadTask>> getAllTasks() async {
+    if (db != null) {
+      List<Map<String, dynamic>> maps = await db!.query(taskTable, orderBy: "createTime DESC");
+      return List.generate(maps.length, (i) {
+        return UploadTask.fromMap(maps[i]);
+      });
+    }
+    return [];
+  }
+
+  Future<List<UploadTask>> getPendingTasks() async {
+    if (db != null) {
+      List<Map<String, dynamic>> maps = await db!.query(taskTable,
+          where: 'status IN (?, ?)',
+          whereArgs: [UploadTask.STATUS_PENDING, UploadTask.STATUS_UPLOADING],
+          orderBy: "createTime ASC");
+      return List.generate(maps.length, (i) {
+        return UploadTask.fromMap(maps[i]);
+      });
+    }
+    return [];
+  }
+
+  Future<int> deleteTask(int id) async {
+    if (db != null) {
+      return await db!.delete(taskTable, where: 'id = ?', whereArgs: [id]);
+    }
+    return -1;
+  }
+
 
   Future<int> insertFileInfo(FileInfoRepo fileInfo) async {
     if (db != null) {
