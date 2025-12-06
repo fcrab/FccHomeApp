@@ -11,6 +11,8 @@ class UploadQueuePage extends StatefulWidget {
 }
 
 class _UploadQueuePageState extends State<UploadQueuePage> {
+  bool _isRetrying = false;
+
   @override
   void initState() {
     super.initState();
@@ -36,15 +38,58 @@ class _UploadQueuePageState extends State<UploadQueuePage> {
         value: UploadService(),
         child: Consumer<UploadService>(
           builder: (context, service, child) {
-            if (service.tasks.isEmpty) {
-              return const Center(child: Text("暂无上传任务"));
-            }
-            return ListView.builder(
-              itemCount: service.tasks.length,
-              itemBuilder: (context, index) {
-                final task = service.tasks[index];
-                return _buildTaskItem(task, service);
-              },
+            bool hasFailedTasks =
+                service.tasks.any((t) => t.status == UploadTask.STATUS_FAILED);
+
+            return Stack(
+              children: [
+                if (service.tasks.isEmpty)
+                  const Center(child: Text("暂无上传任务"))
+                else
+                  ListView.builder(
+                    padding: const EdgeInsets.only(top: 80),
+                    // Make space for the button
+                    itemCount: service.tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = service.tasks[index];
+                      return _buildTaskItem(task, service);
+                    },
+                  ),
+                if (hasFailedTasks)
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: FloatingActionButton.extended(
+                      onPressed: _isRetrying
+                          ? null
+                          : () async {
+                              setState(() {
+                                _isRetrying = true;
+                              });
+                              await service.retryAllFailed();
+                              // Prevent rapid clicks
+                              await Future.delayed(const Duration(seconds: 2));
+                              if (mounted) {
+                                setState(() {
+                                  _isRetrying = false;
+                                });
+                              }
+                            },
+                      icon: _isRetrying
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.refresh),
+                      label: const Text("重试所有失败"),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  ),
+              ],
             );
           },
         ),
@@ -78,6 +123,16 @@ class _UploadQueuePageState extends State<UploadQueuePage> {
         statusColor = Colors.red;
         statusIcon = Icons.error;
         break;
+      case UploadTask.STATUS_DEAD:
+        statusText = "已放弃";
+        statusColor = Colors.brown;
+        statusIcon = Icons.cancel;
+        break;
+      case UploadTask.STATUS_PAUSED:
+        statusText = "已暂停";
+        statusColor = Colors.orangeAccent;
+        statusIcon = Icons.pause_circle;
+        break;
       default:
         statusText = "未知";
         statusColor = Colors.grey;
@@ -93,11 +148,15 @@ class _UploadQueuePageState extends State<UploadQueuePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            if (task.status == UploadTask.STATUS_FAILED)
-              Text("错误: ${task.errorMessage}", style: const TextStyle(color: Colors.red, fontSize: 12)),
+            if (task.status == UploadTask.STATUS_FAILED ||
+                task.status == UploadTask.STATUS_DEAD)
+              Text("错误: ${task.errorMessage ?? '未知错误'}",
+                  style: const TextStyle(color: Colors.red, fontSize: 12)),
             if (task.status == UploadTask.STATUS_UPLOADING)
               LinearProgressIndicator(value: task.progress / 100),
-            if (task.status != UploadTask.STATUS_UPLOADING && task.status != UploadTask.STATUS_FAILED)
+            if (task.status != UploadTask.STATUS_UPLOADING &&
+                task.status != UploadTask.STATUS_FAILED &&
+                task.status != UploadTask.STATUS_DEAD)
               Text("大小: ${_formatFileSize(task.fileSize)}", style: const TextStyle(fontSize: 12)),
             const SizedBox(height: 4),
             Row(
@@ -110,22 +169,38 @@ class _UploadQueuePageState extends State<UploadQueuePage> {
             )
           ],
         ),
-        trailing: task.status == UploadTask.STATUS_FAILED
-            ? IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  service.retryTask(task);
-                },
-              )
-            : null,
+        trailing: _buildTrailingAction(task, service),
       ),
     );
+  }
+
+  Widget? _buildTrailingAction(UploadTask task, UploadService service) {
+    if (task.status == UploadTask.STATUS_FAILED ||
+        task.status == UploadTask.STATUS_DEAD) {
+      return IconButton(
+        icon: const Icon(Icons.refresh),
+        onPressed: () => service.retryTask(task),
+      );
+    } else if (task.status == UploadTask.STATUS_PAUSED) {
+      return IconButton(
+        icon: const Icon(Icons.play_arrow),
+        onPressed: () => service.resumeTask(task),
+      );
+    } else if (task.status == UploadTask.STATUS_PENDING ||
+        task.status == UploadTask.STATUS_UPLOADING) {
+      return IconButton(
+        icon: const Icon(Icons.pause),
+        onPressed: () => service.pauseTask(task),
+      );
+    }
+    return null;
   }
 
   String _formatFileSize(int bytes) {
     if (bytes <= 0) return "0 B";
     const suffixes = ["B", "KB", "MB", "GB", "TB"];
     var i = (bytes.toString().length / 3).floor();
-    return ((bytes / (1024 * i)).toStringAsFixed(2)) + ' ' + suffixes[i]; // Simplified logic
+    if (i >= suffixes.length) i = suffixes.length - 1;
+    return ((bytes / (1024 * i)).toStringAsFixed(2)) + ' ' + suffixes[i];
   }
 }

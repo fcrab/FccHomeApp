@@ -4,6 +4,7 @@ class UploadTask {
   static const int STATUS_COMPLETED = 2;
   static const int STATUS_FAILED = 3;
   static const int STATUS_PAUSED = 4;
+  static const int STATUS_DEAD = 5;
 
   int? id;
   String fileName;
@@ -15,6 +16,7 @@ class UploadTask {
   int progress;
   String? errorMessage;
   int createTime;
+  int retryCount;
 
   UploadTask({
     this.id,
@@ -27,6 +29,7 @@ class UploadTask {
     this.progress = 0,
     this.errorMessage,
     required this.createTime,
+    this.retryCount = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -41,6 +44,7 @@ class UploadTask {
       'progress': progress,
       'errorMessage': errorMessage,
       'createTime': createTime,
+      'retryCount': retryCount,
     };
   }
 
@@ -56,6 +60,7 @@ class UploadTask {
       progress: map['progress'] ?? 0,
       errorMessage: map['errorMessage'],
       createTime: map['createTime'] ?? DateTime.now().millisecondsSinceEpoch,
+      retryCount: map['retryCount'] ?? 0,
     );
   }
 }

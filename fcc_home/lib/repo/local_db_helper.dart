@@ -20,7 +20,16 @@ class LocalDBHelper {
       if (oldVersion < 3) {
         await _createTaskTable(db);
       }
-    }, version: 3);
+      if (oldVersion < 4) {
+        // Add retryCount column
+        try {
+          await db.execute(
+              "ALTER TABLE $taskTable ADD COLUMN retryCount INTEGER DEFAULT 0");
+        } catch (e) {
+          print("Error adding retryCount column: $e");
+        }
+      }
+    }, version: 4);
   }
 
   Future<void> _createTaskTable(Database db) async {
@@ -35,7 +44,8 @@ class LocalDBHelper {
         status INTEGER,
         progress INTEGER,
         errorMessage TEXT,
-        createTime INTEGER
+        createTime INTEGER,
+        retryCount INTEGER DEFAULT 0
       )
     ''');
   }
