@@ -22,76 +22,110 @@ class _UploadQueuePageState extends State<UploadQueuePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("提交队列"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_sweep),
-            onPressed: () {
-              // Clear completed tasks? Or all?
-            },
-          )
-        ],
-      ),
-      body: ChangeNotifierProvider.value(
-        value: UploadService(),
-        child: Consumer<UploadService>(
-          builder: (context, service, child) {
-            bool hasFailedTasks =
-                service.tasks.any((t) => t.status == UploadTask.STATUS_FAILED);
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("提交队列"),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: "进行中"),
+              Tab(text: "已完成"),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.delete_sweep),
+              onPressed: () {
+                // TODO: Implement clear logic if needed
+              },
+            )
+          ],
+        ),
+        body: ChangeNotifierProvider.value(
+          value: UploadService(),
+          child: Consumer<UploadService>(
+            builder: (context, service, child) {
+              // Filter tasks
+              final activeTasks = service.tasks.where((t) => t.status != UploadTask.STATUS_COMPLETED).toList();
+              final completedTasks = service.tasks.where((t) => t.status == UploadTask.STATUS_COMPLETED).toList();
+              
+              // Sort active tasks: Failed first? Or by time? 
+              // Usually keep original order or newest first.
+              // Current implementation in service just returns list.
+              // We'll keep default order.
 
-            return Stack(
-              children: [
-                if (service.tasks.isEmpty)
-                  const Center(child: Text("暂无上传任务"))
-                else
-                  ListView.builder(
-                    padding: const EdgeInsets.only(top: 80),
-                    // Make space for the button
-                    itemCount: service.tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = service.tasks[index];
-                      return _buildTaskItem(task, service);
-                    },
-                  ),
-                if (hasFailedTasks)
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: FloatingActionButton.extended(
-                      onPressed: _isRetrying
-                          ? null
-                          : () async {
-                              setState(() {
-                                _isRetrying = true;
-                              });
-                              await service.retryAllFailed();
-                              // Prevent rapid clicks
-                              await Future.delayed(const Duration(seconds: 2));
-                              if (mounted) {
-                                setState(() {
-                                  _isRetrying = false;
-                                });
-                              }
-                            },
-                      icon: _isRetrying
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
+              bool hasFailedTasks = activeTasks.any((t) => t.status == UploadTask.STATUS_FAILED);
+
+              return TabBarView(
+                children: [
+                  // Tab 1: Active Tasks
+                  Column(
+                    children: [
+                      if (hasFailedTasks)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton.icon(
+                            onPressed: _isRetrying
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      _isRetrying = true;
+                                    });
+                                    await service.retryAllFailed();
+                                    // Prevent rapid clicks
+                                    await Future.delayed(const Duration(seconds: 2));
+                                    if (mounted) {
+                                      setState(() {
+                                        _isRetrying = false;
+                                      });
+                                    }
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            icon: _isRetrying
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.refresh),
+                            label: const Text("重试所有失败"),
+                          ),
+                        ),
+                      Expanded(
+                        child: activeTasks.isEmpty
+                            ? const Center(child: Text("暂无进行中任务"))
+                            : ListView.builder(
+                                itemCount: activeTasks.length,
+                                itemBuilder: (context, index) {
+                                  return _buildTaskItem(activeTasks[index], service);
+                                },
                               ),
-                            )
-                          : const Icon(Icons.refresh),
-                      label: const Text("重试所有失败"),
-                      backgroundColor: Colors.redAccent,
-                    ),
+                      ),
+                    ],
                   ),
-              ],
-            );
-          },
+
+                  // Tab 2: Completed Tasks
+                  completedTasks.isEmpty
+                      ? const Center(child: Text("暂无已完成任务"))
+                      : ListView.builder(
+                          itemCount: completedTasks.length,
+                          itemBuilder: (context, index) {
+                            return _buildTaskItem(completedTasks[index], service);
+                          },
+                        ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
