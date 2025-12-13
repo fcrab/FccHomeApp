@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:fcc_home/vm/grid_prefs_vm.dart';
 
 import 'display_page.dart';
 
@@ -92,7 +93,7 @@ class MinePageState extends State<MinePageWidget> with WidgetsBindingObserver {
       create: (ctx) => widget.vm.mineEntries,
       child: Consumer<MineFiles>(
         builder: (ctx, info, child) => GridView.count(
-          crossAxisCount: 2,
+          crossAxisCount: Provider.of<GridPrefsVM>(context).crossAxisCount,
           children: List.generate(info.localEntries.length, (index) {
             return Container(
                 // child: Center(child: Image.network(entries[index])),

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fcc_home/vm/media_server_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fcc_home/vm/grid_prefs_vm.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 import 'display_page.dart';
@@ -212,11 +213,11 @@ class WallState extends State<PhotoWall> {
     return WillPopScope(
         child: GridView.builder(
           padding: const EdgeInsets.all(4),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, //每行显示列数2
-              crossAxisSpacing: 4.0, //列间距
-              mainAxisSpacing: 4.0, //行间距
-              childAspectRatio: 1 //item的宽高比
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: Provider.of<GridPrefsVM>(context).crossAxisCount,
+              crossAxisSpacing: 4.0,
+              mainAxisSpacing: 4.0,
+              childAspectRatio: 1
           ),
           itemCount: mediaList.list.length,
           itemBuilder: (BuildContext context, int index) {

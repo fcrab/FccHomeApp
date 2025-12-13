@@ -5,6 +5,8 @@ import 'package:fcc_home/ui/upload_queue_page.dart';
 import 'package:fcc_home/util/wake_rock.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:provider/provider.dart';
+import 'package:fcc_home/vm/grid_prefs_vm.dart';
 
 import '../entity/auth_purpose.dart';
 import '../util/AppColors.dart';
@@ -32,6 +34,8 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
   late List<PopupMenuEntry<String>> _menuList;
 
+  late GridPrefsVM _gridPrefs;
+
   void setTitle(String barTitle) {
     setState(() {
       widget.title = barTitle;
@@ -54,6 +58,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
     syncBtn = genSyncBtn();
     _menuList = genMenuItemList('default');
+
+    _gridPrefs = GridPrefsVM();
+    _gridPrefs.init();
   }
 
   List<PopupMenuEntry<String>> genMenuItemList(String mode) {
@@ -176,7 +183,9 @@ class _HomePageWidgetState extends State<HomePageWidget>
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     String name =
         HomeGlobal.loginInfo != null ? HomeGlobal.loginInfo!.name : "";
-    return Scaffold(
+    return ChangeNotifierProvider<GridPrefsVM>.value(
+      value: _gridPrefs,
+      child: Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -194,6 +203,18 @@ class _HomePageWidgetState extends State<HomePageWidget>
               // }).toList();
             },
           ),
+          Consumer<GridPrefsVM>(
+              builder: (ctx, grid, _) => PopupMenuButton<int>(
+                    icon: const Icon(Icons.settings),
+                    onSelected: (v) {
+                      grid.setCount(v);
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem<int>(value: 2, child: Text('2')),
+                      PopupMenuItem<int>(value: 4, child: Text('4')),
+                      PopupMenuItem<int>(value: 6, child: Text('6')),
+                    ],
+                  ))
         ],
         // actions: [
         // CustomAction(
@@ -284,6 +305,7 @@ class _HomePageWidgetState extends State<HomePageWidget>
         unselectedItemColor: Theme.of(context).colorScheme.tertiary,
         onTap: _onTapItem,
       ),
+    ),
     );
   }
 }
