@@ -152,6 +152,7 @@ class MinePageVM {
           await HomeGlobal.platform.invokeListMethod("getAllPics", bucketId);
       // print(pics);
       List<String> picsPath = [];
+      print("getpicsback");
       for (String pic in pics) {
         Map<String, dynamic> picsMap = json.decode(pic);
         // print(picsMap['data']);
@@ -177,6 +178,7 @@ class MinePageVM {
         syncFiles.add(info);
       }
       entries = picsPath;
+      print("init datas size : ${picsPath.length}");
       mineEntries.refreshFiles(syncFiles);
       // (_pageWidget[0] as MinePageWidget).setList(picsPath);
       detailVm = MineVirualVM(datas);
@@ -192,12 +194,14 @@ class MinePageVM {
 
     //todo test
     var uris = mineEntries.localEntries.map((e) => e.uri).toList();
+    print("syncuris : ${uris.length}");
     var existFiles = await dbHelper.retrieveFilesByPath(uris);
+    print("existFileSize: ${existFiles.length}");
     var waitToChecks = existFiles.map((e) => e.md5).toList();
-
+    print("wait to check size ${waitToChecks.length}");
     var start = 0;
     while (start < waitToChecks.length) {
-      var end = start + 100;
+      var end = start + 200;
       if (end > waitToChecks.length) {
         end = waitToChecks.length;
       }

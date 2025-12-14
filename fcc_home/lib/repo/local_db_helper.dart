@@ -14,7 +14,7 @@ class LocalDBHelper {
         join(await getDatabasesPath(), 'local_album_database.db'),
         onCreate: (db, version) async {
       await db.execute(
-          'CREATE TABLE $fileTable(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,path TEXT,type TEXT,md5 TEXT,bucket TEXT,length INTEGER,sync BOOLEAN)');
+          'CREATE TABLE $fileTable(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,path TEXT,type TEXT,md5 TEXT UNIQUE,bucket TEXT,length INTEGER,sync BOOLEAN)');
       await _createTaskTable(db);
     }, onUpgrade: (db, oldVersion, newVersion) async {
       if (oldVersion < 3) {
@@ -29,7 +29,24 @@ class LocalDBHelper {
           print("Error adding retryCount column: $e");
         }
       }
-    }, version: 4);
+      if (oldVersion < 5) {
+        try {
+          await db.execute('''
+            DELETE FROM $fileTable
+            WHERE id NOT IN (
+              SELECT MIN(id) FROM $fileTable GROUP BY md5
+            )
+            AND md5 IN (
+              SELECT md5 FROM $fileTable GROUP BY md5 HAVING COUNT(*) > 1
+            )
+          ''');
+        } catch (e) {}
+        try {
+          await db.execute(
+              'CREATE UNIQUE INDEX IF NOT EXISTS idx_${fileTable}_md5 ON $fileTable(md5)');
+        } catch (e) {}
+      }
+    }, version: 5);
   }
 
   Future<void> _createTaskTable(Database db) async {
@@ -111,7 +128,11 @@ class LocalDBHelper {
 
   Future<int> insertFileInfo(FileInfoRepo fileInfo) async {
     if (db != null) {
-      int result = await db!.insert(fileTable, fileInfo.toMap());
+      int result = await db!.insert(
+        fileTable,
+        fileInfo.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
       return result;
     } else {
       return -1;
@@ -152,6 +173,7 @@ class LocalDBHelper {
     }
   }
 
+  //todo 表可能会被插入重复数据，导致这里出现多倍数据的情况，需要从插入的地方进行控制
   Future<List<FileInfoRepo>> retrieveFilesByPath(List<String> uri) async {
     if (db != null) {
       List<Map<String, Object?>> result =
